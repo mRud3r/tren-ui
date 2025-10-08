@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Button } from '@/components/ui/button'
 
 export default async function ProtectedPage() {
 	const supabase = await createClient()
@@ -9,5 +10,9 @@ export default async function ProtectedPage() {
 		redirect('/auth/login')
 	}
 
-	return <div className='flex-1 w-full flex flex-col gap-12'></div>
+	return (
+		<div className='flex-1 w-full flex flex-col gap-12'>
+			<Button className='bg-accent text-accent-foreground'>Test</Button>
+		</div>
+	)
 }
