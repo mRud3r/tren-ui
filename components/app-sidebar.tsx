@@ -1,4 +1,4 @@
-import { Calendar, Home, Dumbbell, Search, TrendingUp } from 'lucide-react'
+import { Calendar, Home, Dumbbell, TrendingUp } from 'lucide-react'
 
 import {
 	Sidebar,

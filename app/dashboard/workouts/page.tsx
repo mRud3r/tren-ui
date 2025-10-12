@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-
 export default async function WorkoutsPage() {
 	return (
 		<div className='p-4'>
