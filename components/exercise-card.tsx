@@ -1,19 +1,20 @@
 import { Card, CardHeader, CardTitle } from './ui/card'
 
-export type Exercise = {
-  id: number
-  exercise_name: string
+export function ExerciseCard({
+  name,
+  difficulty,
+  primaryMuscle,
+}: {
+  name: string
   difficulty: 'easy' | 'intermediate' | 'hard'
-}
-
-export function ExerciseCard({ name, difficulty }: { name: string; difficulty: Exercise['difficulty'] }) {
+  primaryMuscle: string | null
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {name}
-        </CardTitle>
-        <span className="text-sm opacity-70">{difficulty}</span>
+        <CardTitle>{name}</CardTitle>
+        <span className='text-sm opacity-70'>{difficulty}</span>
+        {primaryMuscle && <span className='text-sm opacity-70'>Primary muscle: {primaryMuscle}</span>}
       </CardHeader>
     </Card>
   )
