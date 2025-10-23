@@ -36,7 +36,7 @@ export const WorkoutCard = ({ name, description, tag, duration, exerciseCount }:
             <span>Duration: {duration} min</span>
           ) : null}
           {typeof exerciseCount === 'number' ? (
-            <span>{exerciseCount} ćwiczeń</span>
+            <span>{exerciseCount} exercises</span>
           ) : null}
         </div>
       </CardContent>

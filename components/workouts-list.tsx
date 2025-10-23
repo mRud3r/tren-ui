@@ -32,9 +32,7 @@ export const WorkoutsList = async () => {
 		description: (w.description as string) ?? null,
 		tag: (w.tag as string) ?? null,
 		duration: (w.duration as number) ?? null,
-		exerciseCount: Array.isArray((w as any).workout_exercises)
-			? (w as any).workout_exercises.length
-			: 0,
+		exerciseCount: Array.isArray((w as any).workout_exercises) ? (w as any).workout_exercises.length : 0,
 	}))
 
 	return (
