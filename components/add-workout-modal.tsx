@@ -89,8 +89,12 @@ export const AddWorkoutModal = () => {
 
 			setOpen(false)
 			router.refresh()
-		} catch (err: any) {
-			setError(err?.message ?? 'Unexpected error')
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				setError(err.message)
+			} else {
+				setError('Unexpected error')
+			}
 		} finally {
 			setSubmitting(false)
 		}

@@ -30,12 +30,10 @@ export function ExerciseCombobox({
 	const supabase = React.useMemo(() => createClient(), [])
 	const [open, setOpen] = React.useState(false)
 
-	// fetched options
 	const [options, setOptions] = React.useState<ExerciseOption[]>([])
 	const [loading, setLoading] = React.useState(false)
 	const [fetchError, setFetchError] = React.useState<string | null>(null)
 
-	// we lazily fetch when popover first opens
 	const didFetchRef = React.useRef(false)
 	React.useEffect(() => {
 		if (!open) return
@@ -54,7 +52,7 @@ export function ExerciseCombobox({
 				setFetchError(error.message)
 			} else {
 				setOptions(
-					(data ?? []).map((row: any) => ({
+					(data ?? []).map((row: { id: number; exercise_name: string | null }) => ({
 						id: row.id,
 						name: row.exercise_name ?? '',
 					}))
