@@ -1,5 +1,6 @@
 import { ExerciseCard } from './exercise-card'
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 import type { ExerciseCardData } from '@/types/view'
 
 export const ExercisesList = async () => {
@@ -53,13 +54,15 @@ export const ExercisesList = async () => {
 	return (
 		<div className='grid sm:grid-cols-2 xl:grid-cols-3 gap-4'>
 			{exercises.map(ex => (
-				<ExerciseCard
-					key={ex.id}
-					name={ex.name}
-					difficulty={ex.difficulty}
-					primaryMuscle={ex.primaryMuscle?.name ?? null}
-					secondaryMuscles={ex.secondaryMuscles}
-				/>
+				<Link key={ex.id} href={`/dashboard/excercises/${ex.id}`} className='block'>
+					<ExerciseCard
+						key={ex.id}
+						name={ex.name}
+						difficulty={ex.difficulty}
+						primaryMuscle={ex.primaryMuscle?.name ?? null}
+						secondaryMuscles={ex.secondaryMuscles}
+					/>
+				</Link>
 			))}
 		</div>
 	)
