@@ -1,8 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
-import { Button } from './ui/button'
-import { Play } from 'lucide-react'
-import Link from 'next/link'
+import { StartWorkoutButton } from './start-workout-button'
 
 export type WorkoutCardProps = {
 	id: number
@@ -39,11 +37,7 @@ export const WorkoutCard = ({ id, name, description, tag, duration, exerciseCoun
 				</div>
 			</CardContent>
 			<CardFooter>
-				<Button className='w-full' asChild>
-					<Link className='flex gap-1 items-center w-full' href={`/dashboard/workouts/${id}`}>
-						<Play /> Start workout
-					</Link>
-				</Button>
+				<StartWorkoutButton workoutId={id} />
 			</CardFooter>
 		</Card>
 	)
