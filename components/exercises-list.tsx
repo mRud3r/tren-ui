@@ -3,10 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { ExerciseCardData } from '@/types/view'
 
-export const ExercisesList = async () => {
+export const ExercisesList = async ({ search, muscle }: { search?: string; muscle?: string }) => {
 	const supabase = await createClient()
 
-	const { data: exercisesData, error } = await supabase
+	let query = supabase
 		.from('exercises')
 		.select(
 			`
@@ -17,7 +17,18 @@ export const ExercisesList = async () => {
       secondary_muscle_ids
     `
 		)
-		.order('id', { ascending: true })
+
+	if (search) {
+		query = query.ilike('exercise_name', `%${search}%`)
+	}
+
+	if (muscle) {
+		query = query.eq('primary_muscle_id', Number(muscle))
+	}
+
+	const { data: exercisesData, error } = await query.order('id', {
+		ascending: true,
+	})
 
 	const { data: musclesData } = await supabase.from('muscle_groups').select('id, name')
 
