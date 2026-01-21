@@ -1,5 +1,6 @@
 import FinishWorkoutButton from '@/components/shared/finish-workout-button'
 import { createClient } from '@/lib/supabase/server'
+import { ExerciseSetsForm } from '@/components/shared/exercise-sets-form'
 
 export default async function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -36,8 +37,9 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 		<div>
 			<h1>Workout {id}</h1>
 			{workoutExercises?.map((item, index) => (
-				<div key={item.exercise.id}>
-					{index + 1}. {item.exercise.exercise_name}
+				<div key={item.exercise.id} className='flex items-center gap-2'>
+					{item.exercise.exercise_name}
+					<ExerciseSetsForm exerciseId={item.exercise.id} />
 				</div>
 			))}
 			<FinishWorkoutButton sessionId={id} />
