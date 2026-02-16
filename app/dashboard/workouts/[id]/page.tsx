@@ -1,6 +1,7 @@
 import FinishWorkoutButton from '@/components/shared/finish-workout-button'
+import WorkoutExerciseCard from '@/components/shared/workout-exercise-card'
 import { createClient } from '@/lib/supabase/server'
-import { ExerciseSetsForm } from '@/components/shared/exercise-sets-form'
+import { Calendar } from 'lucide-react'
 
 export default async function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -34,15 +35,25 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 		.eq('workout_id', session.workout_id)
 
 	return (
-		<div>
-			<h1>Workout {id}</h1>
-			{workoutExercises?.map(item => (
-				<div key={item.exercise.id} className='flex items-center gap-2'>
-					{item.exercise.exercise_name}
-					<ExerciseSetsForm exerciseId={item.exercise.id} />
+		<div className='w-full space-y-6 p-4'>
+			<div className='flex items-center justify-between'>
+				<div className='flex gap-4'>
+					<h1 className='font-semibold text-xl'>Workout {id}</h1>
+					<span className='flex items-center gap-1 text-xs text-muted-foreground'>
+						<Calendar className='h-3 w-3' />
+						{new Date().toLocaleDateString()}
+					</span>
 				</div>
+				<FinishWorkoutButton sessionId={id} />
+			</div>
+
+			{workoutExercises?.map(item => (
+				<WorkoutExerciseCard
+					key={item.exercise.id}
+					exerciseId={item.exercise.id}
+					exerciseName={item.exercise.exercise_name || 'Unnamed Exercise'}
+				/>
 			))}
-			<FinishWorkoutButton sessionId={id} />
 		</div>
 	)
 }

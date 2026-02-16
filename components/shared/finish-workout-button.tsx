@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '../ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { Save } from 'lucide-react'
 
 export default function FinishWorkoutButton({ sessionId }: { sessionId: string }) {
 	const supabase = createClient()
@@ -48,8 +49,9 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 	}
 
 	return (
-		<Button onClick={finishWorkout} disabled={loading || finished} className='w-full'>
-			{finished ? 'Workout Finished' : loading ? 'Finishing…' : 'Finish workout'}
+		<Button onClick={finishWorkout} disabled={loading || finished}>
+			<Save className='ml-1 h-4 w-4' />
+			{finished ? 'Workout Saved' : loading ? 'Saving…' : 'Save workout'}
 		</Button>
 	)
 }
