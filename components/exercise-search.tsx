@@ -42,7 +42,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	React.useEffect(() => {
 		const handle = window.setTimeout(() => {
 			const normalized = searchValue.trim()
-			setParam('search', normalized || undefined)
+			setParam('search', normalized ? normalized : undefined)
 		}, 300)
 
 		return () => window.clearTimeout(handle)
@@ -50,8 +50,10 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 
 	React.useEffect(() => {
 		const current = params.get('search') ?? ''
-		setSearchValue(current)
-	}, [params])
+		if (current !== searchValue) {
+			setSearchValue(current)
+		}
+	}, [params, searchValue])
 
 	return (
 		<div className='flex gap-2'>
