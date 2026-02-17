@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Search } from 'lucide-react'
 import {
@@ -21,23 +22,44 @@ type Props = {
 export function ExerciseSearch({ muscles, musclesError }: Props) {
 	const router = useRouter()
 	const params = useSearchParams()
+	const [searchValue, setSearchValue] = React.useState(params.get('search') ?? '')
 
-	function setParam(key: string, value?: string) {
-		const sp = new URLSearchParams(params.toString())
+	const setParam = React.useCallback(
+		(key: string, value?: string) => {
+			const sp = new URLSearchParams(params.toString())
+			if (!value) sp.delete(key)
+			else sp.set(key, value)
 
-		if (!value) sp.delete(key)
-		else sp.set(key, value)
+			const next = sp.toString()
+			const current = params.toString()
+			if (next === current) return
 
-		router.replace(`?${sp.toString()}`)
-	}
+			router.replace(next ? `?${next}` : '?')
+		},
+		[params, router],
+	)
+
+	React.useEffect(() => {
+		const handle = window.setTimeout(() => {
+			const normalized = searchValue.trim()
+			setParam('search', normalized ? normalized : undefined)
+		}, 300)
+
+		return () => window.clearTimeout(handle)
+	}, [searchValue, setParam])
+
+	React.useEffect(() => {
+		const current = params.get('search') ?? ''
+		setSearchValue(current)
+	}, [params])
 
 	return (
 		<div className='flex gap-2'>
 			<InputGroup>
 				<InputGroupInput
 					placeholder='Search...'
-					defaultValue={params.get('search') ?? ''}
-					onChange={e => setParam('search', e.target.value)}
+					value={searchValue}
+					onChange={e => setSearchValue(e.target.value)}
 				/>
 				<InputGroupAddon>
 					<Search />
