@@ -25,7 +25,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	const router = useRouter()
 	const params = useSearchParams()
 	const searchParam = params.get('search') ?? ''
-	const [searchValue, setSearchValue] = React.useState(params.get('search') ?? '')
+	const [searchValue, setSearchValue] = React.useState(searchParam)
 
 	const setParam = React.useCallback(
 		(key: string, value?: string) => {
@@ -52,7 +52,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	}, [searchValue, setParam])
 
 	React.useEffect(() => {
-		setSearchValue(searchParam)
+		setSearchValue(prev => (prev === searchParam ? prev : searchParam))
 	}, [searchParam])
 
 	return (
