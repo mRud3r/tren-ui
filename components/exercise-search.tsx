@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/select'
 import { useSearchParams, useRouter } from 'next/navigation'
 
+const SEARCH_DEBOUNCE_MS = 300
+
 type Props = {
 	muscles: { id: number; name: string }[]
 	musclesError: boolean
@@ -44,13 +46,13 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 		const handle = window.setTimeout(() => {
 			const normalized = searchValue.trim()
 			setParam('search', normalized || undefined)
-		}, 300)
+		}, SEARCH_DEBOUNCE_MS)
 
 		return () => window.clearTimeout(handle)
 	}, [searchValue, setParam])
 
 	React.useEffect(() => {
-		setSearchValue(prev => (prev === searchParam ? prev : searchParam))
+		setSearchValue(searchParam)
 	}, [searchParam])
 
 	return (
