@@ -42,7 +42,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	React.useEffect(() => {
 		const handle = window.setTimeout(() => {
 			const normalized = searchValue.trim()
-			setParam('search', normalized || undefined)
+			setParam('search', normalized === '' ? undefined : normalized)
 		}, 300)
 
 		return () => window.clearTimeout(handle)
@@ -50,7 +50,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 
 	React.useEffect(() => {
 		const current = params.get('search') ?? ''
-		setSearchValue(current)
+		setSearchValue(prev => (prev === current ? prev : current))
 	}, [params])
 
 	return (
