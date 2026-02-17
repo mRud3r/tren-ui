@@ -52,8 +52,10 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	}, [searchValue, setParam])
 
 	React.useEffect(() => {
-		setSearchValue(searchParam)
-	}, [searchParam])
+		if (searchValue !== searchParam) {
+			setSearchValue(searchParam)
+		}
+	}, [searchParam, searchValue])
 
 	return (
 		<div className='flex gap-2'>
