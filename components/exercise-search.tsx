@@ -52,7 +52,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	}, [searchValue, setParam])
 
 	React.useEffect(() => {
-		setSearchValue(searchParam)
+		setSearchValue(prev => (prev === searchParam ? prev : searchParam))
 	}, [searchParam])
 
 	return (
