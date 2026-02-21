@@ -15,17 +15,32 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 		try {
 			setLoading(true)
 
+			const {
+				data: { user },
+			} = await supabase.auth.getUser()
+
+			if (!user) {
+				console.error('You must be logged in to finish a workout')
+				return
+			}
+
 			const exercises = useWorkoutSessionStore.getState().exercises
 
-			const rows = Object.values(exercises).map(ex => ({
-				session_id: Number(sessionId),
-				exercise_id: ex.exerciseId,
-				sets: ex.sets,
-				notes: ex.notes ?? null,
-			}))
+			const rows = Object.values(exercises).flatMap(ex =>
+				ex.sets.map((set, index) => ({
+					session_id: Number(sessionId),
+					exercise_id: ex.exerciseId,
+					set_number: index + 1,
+					repetitions: set.reps,
+					weight: set.weight ?? null,
+					intensity: set.intensity ?? 5,
+					notes: ex.notes ?? '',
+					user_id: user.id,
+				})),
+			)
 
 			if (rows.length > 0) {
-				const { error: exerciseError } = await supabase.from('exercise_session').insert(rows)
+				const { error: exerciseError } = await supabase.from('exercise_sets').insert(rows)
 
 				if (exerciseError) throw exerciseError
 			}

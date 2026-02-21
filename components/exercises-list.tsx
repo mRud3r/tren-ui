@@ -31,11 +31,11 @@ export const ExercisesList = async ({ search, muscle }: { search?: string; muscl
 	const { data: musclesData } = await supabase.from('muscle_groups').select('id, name')
 
 	if (error) {
-		return <div className='text-sm text-destructive'>Błąd pobierania ćwiczeń: {error.message}</div>
+		return <div className='text-sm text-destructive'>Error fetching exercises: {error.message}</div>
 	}
 
 	if (!exercisesData || exercisesData.length === 0) {
-		return <div className='text-sm opacity-70'>Brak ćwiczeń</div>
+		return <div className='text-sm opacity-70'>No exercises found</div>
 	}
 
 	const musclesById = new Map<number, { id: number; name: string }>(

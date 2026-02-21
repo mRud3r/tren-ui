@@ -14,12 +14,23 @@ export function StartWorkoutButton({ workoutId }: { workoutId: number }) {
 	async function startWorkout() {
 		try {
 			setLoading(true)
+
+			const {
+				data: { user },
+			} = await supabase.auth.getUser()
+
+			if (!user) {
+				console.error('You must be logged in to start a workout')
+				return
+			}
+
 			const { data, error } = await supabase
 				.from('workout_session')
 				.insert({
 					workout_id: workoutId,
 					started_at: new Date().toISOString(),
 					status: 'started',
+					user_id: user.id,
 				})
 				.select()
 				.single()
