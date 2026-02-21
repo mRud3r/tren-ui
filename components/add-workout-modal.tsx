@@ -44,11 +44,21 @@ export const AddWorkoutModal = () => {
 
 		setSubmitting(true)
 		try {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser()
+
+			if (!user) {
+				setError('You must be logged in to create a workout')
+				return
+			}
+
 			const payload = {
 				name: workout.name.trim(),
 				description: workout.description?.trim?.() || null,
 				tag: workout.tag,
 				duration: workout.duration ?? null,
+				user_id: user.id,
 			}
 
 			const { data: workoutRows, error: insertWorkoutError } = await supabase

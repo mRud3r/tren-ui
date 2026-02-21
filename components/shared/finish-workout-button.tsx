@@ -15,6 +15,15 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 		try {
 			setLoading(true)
 
+			const {
+				data: { user },
+			} = await supabase.auth.getUser()
+
+			if (!user) {
+				console.error('You must be logged in to finish a workout')
+				return
+			}
+
 			const exercises = useWorkoutSessionStore.getState().exercises
 
 			const rows = Object.values(exercises).flatMap(ex =>
@@ -26,6 +35,7 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 					weight: set.weight ?? null,
 					intensity: set.intensity ?? 5,
 					notes: ex.notes ?? '',
+					user_id: user.id,
 				})),
 			)
 
