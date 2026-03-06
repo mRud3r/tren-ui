@@ -12,11 +12,11 @@ export const WorkoutsList = async () => {
 		.order('id', { ascending: true })
 
 	if (error) {
-		return <div className='text-sm text-destructive'>Błąd pobierania treningów: {error.message}</div>
+		return <div className='text-sm text-destructive'>Error while downloading workouts: {error.message}</div>
 	}
 
 	if (!workoutsData || workoutsData.length === 0) {
-		return <div className='text-sm opacity-70'>Brak treningów</div>
+		return <div className='text-sm opacity-70'>No workouts available</div>
 	}
 
 	const workouts: WorkoutCardData[] = (
