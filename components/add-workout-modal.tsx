@@ -9,7 +9,6 @@ import { Textarea } from './ui/textarea'
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectGroup, SelectItem } from './ui/select'
 import { FieldSet, FieldGroup, Field, FieldLabel } from './ui/field'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { WorkoutCardData } from '@/types/view'
 import { ExerciseCombobox } from '@/components/shared/exercises-combobox'
 
@@ -17,7 +16,6 @@ type WorkoutFormData = Omit<WorkoutCardData, 'id' | 'exerciseCount'>
 
 export const AddWorkoutModal = () => {
 	const router = useRouter()
-	const supabase = createClient()
 
 	const [open, setOpen] = React.useState(false)
 	const [submitting, setSubmitting] = React.useState(false)
@@ -44,61 +42,8 @@ export const AddWorkoutModal = () => {
 
 		setSubmitting(true)
 		try {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser()
-
-			if (!user) {
-				setError('You must be logged in to create a workout')
-				return
-			}
-
-			const payload = {
-				name: workout.name.trim(),
-				description: workout.description?.trim?.() || null,
-				tag: workout.tag,
-				duration: workout.duration ?? null,
-				user_id: user.id,
-			}
-
-			const { data: workoutRows, error: insertWorkoutError } = await supabase
-				.from('workouts')
-				.insert(payload)
-				.select('id')
-				.single()
-
-			if (insertWorkoutError) {
-				setError(insertWorkoutError.message)
-				return
-			}
-
-			const newWorkoutId = workoutRows.id
-
-			if (exList.length > 0) {
-				const relRows = exList.map(exerciseId => ({
-					workout_id: newWorkoutId,
-					exercise_id: exerciseId,
-				}))
-
-				const { error: relError } = await supabase.from('workout_exercises').insert(relRows)
-
-				if (relError) {
-					setError(relError.message)
-					return
-				}
-			}
-
-			setWorkout({
-				name: '',
-				description: null,
-				tag: null,
-				duration: 10,
-			})
-			setExList([])
-			setSelectedExerciseId(null)
-
-			setOpen(false)
-			router.refresh()
+			// TODO: Replace with API route / Server Action
+			setError('Workout creation not implemented yet')
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message)

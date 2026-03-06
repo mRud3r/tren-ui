@@ -1,54 +1,25 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 
 export default async function ExercisePage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
 
-	const supabase = await createClient()
-
 	const exerciseId = Number(id)
 	if (Number.isNaN(exerciseId)) {
 		notFound()
 	}
 
-	const { data: exercise, error } = await supabase
-		.from('exercises')
-		.select(
-			`
-        id,
-        exercise_name,
-        difficulty,
-        primaryMuscle:muscle_groups!exercises_primary_muscle_id_fkey ( id, name ),
-        secondary_muscle_ids,
-		instructions
-      `,
-		)
-		.eq('id', exerciseId)
-		.single()
+	// TODO: Replace with Drizzle query
+	const exercise = null as { exercise_name: string } | null
 
-	if (error || !exercise) {
+	if (!exercise) {
 		notFound()
 	}
 
-	const { data: musclesData } = await supabase.from('muscle_groups').select('id, name')
-
-	const musclesById = new Map<number, { id: number; name: string }>(
-		(musclesData ?? []).map(m => [m.id, { id: m.id, name: m.name }]),
-	)
-
-	const primary = Array.isArray(exercise.primaryMuscle)
-		? (exercise.primaryMuscle[0] ?? null)
-		: (exercise.primaryMuscle ?? null)
-
-	const secondaryMuscles = Array.isArray(exercise.secondary_muscle_ids)
-		? exercise.secondary_muscle_ids
-				.map((mid: number) => musclesById.get(mid))
-				.filter((x): x is { id: number; name: string } => Boolean(x))
-		: []
-
-	const instructions = Array.isArray(exercise.instructions) ? exercise.instructions : []
+	const primary = null as { id: number; name: string } | null
+	const secondaryMuscles: { id: number; name: string }[] = []
+	const instructions: string[] = []
 
 	return (
 		<div className='w-full space-y-6 p-4'>

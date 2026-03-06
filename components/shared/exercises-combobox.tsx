@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { createClient } from '@/lib/supabase/client'
 
 type ExerciseOption = {
 	id: number
@@ -27,7 +26,6 @@ export function ExerciseCombobox({
 	disabled,
 	placeholder = 'Choose exercise',
 }: ExerciseComboboxProps) {
-	const supabase = React.useMemo(() => createClient(), [])
 	const [open, setOpen] = React.useState(false)
 
 	const [options, setOptions] = React.useState<ExerciseOption[]>([])
@@ -39,32 +37,10 @@ export function ExerciseCombobox({
 		if (!open) return
 		if (didFetchRef.current) return
 
-		const fetchExercises = async () => {
-			setLoading(true)
-			setFetchError(null)
-
-			const { data, error } = await supabase
-				.from('exercises')
-				.select('id, exercise_name')
-				.order('id', { ascending: true })
-
-			if (error) {
-				setFetchError(error.message)
-			} else {
-				setOptions(
-					(data ?? []).map((row: { id: number; exercise_name: string | null }) => ({
-						id: row.id,
-						name: row.exercise_name ?? '',
-					}))
-				)
-				didFetchRef.current = true
-			}
-
-			setLoading(false)
-		}
-
-		fetchExercises()
-	}, [open, supabase])
+		// TODO: Replace with fetch from API route
+		setFetchError('Exercise loading not implemented yet')
+		didFetchRef.current = true
+	}, [open])
 
 	const selected = options.find(o => o.id === value)
 

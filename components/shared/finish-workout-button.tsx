@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { Button } from '../ui/button'
-import { createClient } from '@/lib/supabase/client'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { Save } from 'lucide-react'
 
 export default function FinishWorkoutButton({ sessionId }: { sessionId: string }) {
-	const supabase = createClient()
 	const [loading, setLoading] = useState(false)
 	const [finished, setFinished] = useState(false)
 
@@ -15,45 +13,8 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 		try {
 			setLoading(true)
 
-			const {
-				data: { user },
-			} = await supabase.auth.getUser()
-
-			if (!user) {
-				console.error('You must be logged in to finish a workout')
-				return
-			}
-
-			const exercises = useWorkoutSessionStore.getState().exercises
-
-			const rows = Object.values(exercises).flatMap(ex =>
-				ex.sets.map((set, index) => ({
-					session_id: Number(sessionId),
-					exercise_id: ex.exerciseId,
-					set_number: index + 1,
-					repetitions: set.reps,
-					weight: set.weight ?? null,
-					intensity: set.intensity ?? 5,
-					notes: ex.notes ?? '',
-					user_id: user.id,
-				})),
-			)
-
-			if (rows.length > 0) {
-				const { error: exerciseError } = await supabase.from('exercise_sets').insert(rows)
-
-				if (exerciseError) throw exerciseError
-			}
-
-			const { error } = await supabase
-				.from('workout_session')
-				.update({
-					status: 'completed',
-					finished_at: new Date().toISOString(),
-				})
-				.eq('id', Number(sessionId))
-
-			if (error) throw error
+			// TODO: Replace with API route / Server Action
+			console.error('Finish workout not implemented yet', sessionId)
 			useWorkoutSessionStore.getState().clear()
 			setFinished(true)
 		} catch (err) {
