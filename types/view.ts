@@ -1,31 +1,31 @@
-// Standalone types — will be replaced by Drizzle inferred types in Phase 2
+import type { exercises, muscleGroups, workouts } from '@/lib/db/schema'
 
-export type DifficultyLevel = 'easy' | 'intermediate' | 'hard'
+// Drizzle inferred row types
+type ExerciseRow = typeof exercises.$inferSelect
+type MuscleRow = typeof muscleGroups.$inferSelect
+type WorkoutRow = typeof workouts.$inferSelect
+
+export type DifficultyLevel = ExerciseRow['difficulty']
+export type WorkoutTag = NonNullable<WorkoutRow['tag']>
 export type SessionStatus = 'completed' | 'started' | 'cancelled'
-export type WorkoutTag = 'push' | 'pull' | 'legs' | 'cardio'
 
 export type ExerciseCardData = {
-	id: number
-	name: string
-	difficulty: DifficultyLevel
-	primaryMuscle: { id: number; name: string } | null
-	secondaryMuscles: { id: number; name: string }[]
+	id: ExerciseRow['id']
+	name: ExerciseRow['exerciseName']
+	difficulty: ExerciseRow['difficulty']
+	primaryMuscle: { id: MuscleRow['id']; name: MuscleRow['name'] } | null
+	secondaryMuscles: { id: MuscleRow['id']; name: MuscleRow['name'] }[]
 }
 
-export type ExercisePageData = {
-	id: number
-	name: string
-	difficulty: DifficultyLevel
-	primaryMuscle: { id: number; name: string } | null
-	secondaryMuscles: { id: number; name: string }[]
+export type ExercisePageData = ExerciseCardData & {
 	instructions: string[]
 }
 
 export type WorkoutCardData = {
-	id: number
-	name: string
-	description: string | null
-	tag: WorkoutTag | null
-	duration: number | null
+	id: WorkoutRow['id']
+	name: WorkoutRow['name']
+	description: WorkoutRow['description']
+	tag: WorkoutRow['tag']
+	duration: WorkoutRow['duration']
 	exerciseCount: number
 }
