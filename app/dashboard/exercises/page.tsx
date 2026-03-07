@@ -1,5 +1,6 @@
 import { ExercisesList } from '@/components/exercises-list'
 import { ExerciseSearch } from '@/components/exercise-search'
+import { getMuscleGroups } from '@/lib/db/exercises'
 
 export default async function ExcersisesPage({
 	searchParams,
@@ -10,9 +11,7 @@ export default async function ExcersisesPage({
 	}>
 }) {
 	const { search, muscle } = await searchParams
-
-	// TODO: Replace with Drizzle query for muscle_groups
-	const muscleData: { id: number; name: string }[] = []
+	const muscleData = await getMuscleGroups()
 
 	return (
 		<div className='w-full space-y-6 p-4'>
