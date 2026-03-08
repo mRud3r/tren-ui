@@ -8,7 +8,6 @@ export default async function WorkoutsPage() {
 				<h1 className='text-2xl font-medium'>Workouts</h1>
 				<AddWorkoutModal />
 			</div>
-			<p>Create and manage your training routines</p>
 			<WorkoutsList />
 		</div>
 	)

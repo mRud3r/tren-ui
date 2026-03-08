@@ -8,6 +8,14 @@ type MuscleOption = {
 	name: string
 }
 
+type CreateExerciseInput = {
+	name: string
+	difficulty: 'easy' | 'intermediate' | 'hard'
+	primaryMuscleId: number | null
+	secondaryMuscleIds: number[]
+	instructions: string[]
+}
+
 export async function getMuscleGroups(): Promise<MuscleOption[]> {
 	return db
 		.select({
@@ -78,4 +86,19 @@ export async function listExercises(filters: { search?: string; muscle?: string 
 			return muscle ? [muscle] : []
 		}),
 	}))
+}
+
+export async function createExercise(input: CreateExerciseInput): Promise<number> {
+	const [createdExercise] = await db
+		.insert(exercises)
+		.values({
+			exerciseName: input.name,
+			difficulty: input.difficulty,
+			primaryMuscleId: input.primaryMuscleId,
+			secondaryMuscleIds: input.secondaryMuscleIds.length > 0 ? input.secondaryMuscleIds : null,
+			instructions: input.instructions.length > 0 ? input.instructions : null,
+		})
+		.returning({ id: exercises.id })
+
+	return createdExercise.id
 }

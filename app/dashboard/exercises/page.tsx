@@ -1,5 +1,6 @@
 import { ExercisesList } from '@/components/exercises-list'
 import { ExerciseSearch } from '@/components/exercise-search'
+import { AddExerciseModal } from '@/components/add-exercise-modal'
 import { getMuscleGroups } from '@/lib/db/exercises'
 
 export default async function ExcersisesPage({
@@ -15,8 +16,10 @@ export default async function ExcersisesPage({
 
 	return (
 		<div className='w-full space-y-6 p-4'>
-			<h1 className='text-2xl font-medium'>Exercise Library</h1>
-			<p>Browse and learn proper form for exercises</p>
+			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+				<h1 className='text-2xl font-medium'>Exercise Library</h1>
+				<AddExerciseModal muscles={muscleData} />
+			</div>
 			<ExerciseSearch muscles={muscleData} musclesError={false} />
 			<ExercisesList search={search} muscle={muscle} />
 		</div>
