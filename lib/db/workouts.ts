@@ -1,6 +1,6 @@
-import { asc, eq, sql } from 'drizzle-orm'
+import { asc, desc, eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { exercises, workoutExercises, workouts, workoutSession } from '@/lib/db/schema'
+import { exerciseSets, exercises, workoutExercises, workouts, workoutSession } from '@/lib/db/schema'
 import type { DifficultyLevel, WorkoutCardData, WorkoutTag } from '@/types/view'
 
 type CreateWorkoutInput = {
@@ -9,6 +9,20 @@ type CreateWorkoutInput = {
 	tag: WorkoutTag | null
 	duration: number | null
 	exerciseIds: number[]
+}
+
+type FinishWorkoutSessionInput = {
+	sessionId: number
+	finishedAt: Date
+	exercises: Array<{
+		exerciseId: number
+		sets: Array<{
+			reps: number
+			weight: number | null
+			intensity: number | null
+		}>
+		notes: string | null
+	}>
 }
 
 type WorkoutSummary = {
@@ -27,6 +41,16 @@ export type WorkoutSessionPageData = {
 		difficulty: DifficultyLevel
 	}>
 }
+
+export type LastCompletedWorkoutData = {
+	sessionId: number
+	workoutName: string
+	finishedAt: Date | null
+	duration: number | null
+	tag: WorkoutTag | null
+}
+
+type FinishWorkoutSessionResult = { ok: true } | { ok: false; reason: 'invalid-exercise' | 'invalid-session' }
 
 export async function getWorkoutById(workoutId: number): Promise<WorkoutSummary | null> {
 	const [workout] = await db
@@ -138,5 +162,94 @@ export async function getWorkoutSessionPageData(sessionId: number): Promise<Work
 			name: row.name ?? `Exercise ${row.id}`,
 			difficulty: row.difficulty,
 		})),
+	}
+}
+
+export async function finishWorkoutSession(input: FinishWorkoutSessionInput): Promise<FinishWorkoutSessionResult> {
+	const [session] = await db
+		.select({
+			id: workoutSession.id,
+			workoutId: workoutSession.workoutId,
+			startedAt: workoutSession.startedAt,
+			status: workoutSession.status,
+		})
+		.from(workoutSession)
+		.where(eq(workoutSession.id, input.sessionId))
+
+	if (!session || session.status !== 'started') {
+		return { ok: false, reason: 'invalid-session' }
+	}
+
+	const allowedExerciseRows = await db
+		.select({
+			exerciseId: workoutExercises.exerciseId,
+		})
+		.from(workoutExercises)
+		.where(eq(workoutExercises.workoutId, session.workoutId))
+
+	const allowedExerciseIds = new Set(allowedExerciseRows.map(row => row.exerciseId))
+
+	if (input.exercises.some(exercise => !allowedExerciseIds.has(exercise.exerciseId))) {
+		return { ok: false, reason: 'invalid-exercise' }
+	}
+
+	const exerciseSetRows = input.exercises.flatMap(exercise =>
+		exercise.sets.map((set, index) => ({
+			sessionId: input.sessionId,
+			exerciseId: exercise.exerciseId,
+			setNumber: index + 1,
+			repetitions: set.reps,
+			weight: set.weight,
+			intensity: set.intensity,
+			notes: index === 0 ? exercise.notes : null,
+		})),
+	)
+
+	const duration = session.startedAt
+		? Math.max(1, Math.round((input.finishedAt.getTime() - session.startedAt.getTime()) / 60000))
+		: null
+
+	await db.delete(exerciseSets).where(eq(exerciseSets.sessionId, input.sessionId))
+
+	if (exerciseSetRows.length > 0) {
+		await db.insert(exerciseSets).values(exerciseSetRows)
+	}
+
+	await db
+		.update(workoutSession)
+		.set({
+			finishedAt: input.finishedAt,
+			status: 'completed',
+			duration,
+		})
+		.where(eq(workoutSession.id, input.sessionId))
+
+	return { ok: true }
+}
+
+export async function getLastCompletedWorkout(): Promise<LastCompletedWorkoutData | null> {
+	const [session] = await db
+		.select({
+			sessionId: workoutSession.id,
+			workoutName: workouts.name,
+			finishedAt: workoutSession.finishedAt,
+			duration: workoutSession.duration,
+			tag: workouts.tag,
+		})
+		.from(workoutSession)
+		.innerJoin(workouts, eq(workoutSession.workoutId, workouts.id))
+		.where(eq(workoutSession.status, 'completed'))
+		.orderBy(desc(workoutSession.finishedAt), desc(workoutSession.id))
+
+	if (!session) {
+		return null
+	}
+
+	return {
+		sessionId: session.sessionId,
+		workoutName: session.workoutName,
+		finishedAt: session.finishedAt,
+		duration: session.duration,
+		tag: session.tag,
 	}
 }

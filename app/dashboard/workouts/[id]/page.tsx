@@ -28,7 +28,7 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 						{(session.startedAt ?? new Date()).toLocaleDateString()}
 					</span>
 				</div>
-				<FinishWorkoutButton sessionId={id} />
+				<FinishWorkoutButton sessionId={session.sessionId} />
 			</div>
 
 			{session.exercises.length === 0 ? (

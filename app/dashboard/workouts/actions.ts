@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { listExerciseOptions } from '@/lib/db/exercises'
-import { createWorkout, getWorkoutById, startWorkoutSession } from '@/lib/db/workouts'
+import { createWorkout, finishWorkoutSession, getWorkoutById, startWorkoutSession } from '@/lib/db/workouts'
 import type { WorkoutTag } from '@/types/view'
 
 type CreateWorkoutPayload = {
@@ -17,6 +17,19 @@ type StartWorkoutActionResult = {
 	ok: boolean
 	error: string | null
 	sessionId: number | null
+}
+
+type FinishWorkoutPayload = {
+	sessionId: number
+	exercises: Array<{
+		exerciseId: number
+		sets: Array<{
+			reps: number
+			weight: number | null
+			intensity: number | null
+		}>
+		notes: string | null
+	}>
 }
 
 export type WorkoutActionResult = {
@@ -116,5 +129,60 @@ export async function startWorkoutAction(workoutId: number): Promise<StartWorkou
 			error: 'Failed to start workout',
 			sessionId: null,
 		}
+	}
+}
+
+export async function finishWorkoutAction(payload: FinishWorkoutPayload): Promise<WorkoutActionResult> {
+	if (!Number.isInteger(payload.sessionId) || payload.sessionId <= 0) {
+		return {
+			ok: false,
+			error: 'Workout session is invalid',
+		}
+	}
+
+	const exercises = payload.exercises
+		.map(exercise => ({
+			exerciseId: exercise.exerciseId,
+			sets: exercise.sets
+				.filter(set => Number.isFinite(set.reps) && set.reps > 0)
+				.map(set => ({
+					reps: Math.trunc(set.reps),
+					weight: typeof set.weight === 'number' && Number.isFinite(set.weight) ? Math.trunc(set.weight) : null,
+					intensity:
+						typeof set.intensity === 'number' && Number.isFinite(set.intensity) ? Math.trunc(set.intensity) : null,
+				})),
+			notes: exercise.notes?.trim() || null,
+		}))
+		.filter(exercise => Number.isInteger(exercise.exerciseId) && exercise.exerciseId > 0 && exercise.sets.length > 0)
+
+	if (exercises.length === 0) {
+		return {
+			ok: false,
+			error: 'Add at least one completed set before saving',
+		}
+	}
+
+	const result = await finishWorkoutSession({
+		sessionId: payload.sessionId,
+		finishedAt: new Date(),
+		exercises,
+	})
+
+	if (!result.ok) {
+		return {
+			ok: false,
+			error:
+				result.reason === 'invalid-exercise'
+					? 'One of the completed exercises does not belong to this workout'
+					: 'Workout session could not be saved',
+		}
+	}
+
+	revalidatePath('/dashboard')
+	revalidatePath('/dashboard/workouts')
+
+	return {
+		ok: true,
+		error: null,
 	}
 }
