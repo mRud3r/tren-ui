@@ -11,9 +11,14 @@ export default function Home() {
 						<div className='flex gap-5 items-center font-semibold'>
 							<Link href={'/'}>TrenUI</Link>
 						</div>
-						<Button asChild size='sm'>
-							<Link href='/dashboard'>Dashboard</Link>
-						</Button>
+						<div className='flex gap-2 items-center'>
+							<Button asChild variant='outline' size='sm'>
+								<Link href='/auth/sign-in'>Sign In</Link>
+							</Button>
+							<Button asChild size='sm'>
+								<Link href='/auth/sign-up'>Sign Up</Link>
+							</Button>
+						</div>
 					</div>
 				</nav>
 				<div className='flex-1 flex flex-col gap-20 max-w-5xl p-5'>
