@@ -8,7 +8,7 @@ export const WorkoutsList = async () => {
 
 	const { data: workoutsData, error } = await supabase
 		.from('workouts')
-		.select('id, name, description, tag, duration, workout_exercises(id)')
+		.select('id, name, description, duration, workout_exercises(id)')
 		.order('id', { ascending: true })
 
 	if (error) {

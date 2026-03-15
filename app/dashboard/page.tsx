@@ -20,8 +20,7 @@ export default async function DashboardPage() {
     workout:workouts (
       id,
       name,
-      description,
-      tag
+			description
     )
   `,
 		)
@@ -45,7 +44,6 @@ export default async function DashboardPage() {
 						{lastSession.workout.description && <p className='text-sm opacity-70'>{lastSession.workout.description}</p>}
 
 						<div className='text-xs opacity-60 flex gap-3'>
-							{lastSession.workout.tag && <span>Tag: {lastSession.workout.tag}</span>}
 							{lastSession.finished_at && (
 								<span>Finished: {new Date(lastSession.finished_at).toLocaleDateString()}</span>
 							)}
