@@ -1,9 +1,8 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
-import { AddWorkoutExercisesGrid } from '@/components/add-workout-exercises-grid'
+import { AddWorkoutExerciseDrawer } from '@/components/add-workout-exercise-drawer'
 import { AddWorkoutSelectedExercises } from '@/components/add-workout-selected-exercises'
-import { ExerciseSearch } from '@/components/exercise-search'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { isExerciseType } from '@/lib/exerciseTypeIcons'
@@ -81,33 +80,29 @@ export default async function NewWorkoutPage({
 		<div className='w-full space-y-6 p-4'>
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-medium'>Add Workout</h1>
-				<Button asChild type='button' variant='ghost'>
-					<Link href='/dashboard/workouts'>
-						<ArrowLeft />
-						Back to workouts
-					</Link>
-				</Button>
-			</div>
-			<div className='w-full flex gap-8 justify-between'>
-				<div className='space-y-2 w-full'>
-					<ExerciseSearch muscles={musclesData ?? []} musclesError={musclesError} />
-					{exercisesError ? (
-						<div className='text-sm text-destructive'>Error: {exercisesError.message}</div>
-					) : exercises.length === 0 ? (
-						<div className='text-sm opacity-70'>No exercises available</div>
-					) : (
-						<AddWorkoutExercisesGrid exercises={exercises} />
-					)}
+				<div className='flex items-center gap-2'>
+					<AddWorkoutExerciseDrawer
+						muscles={musclesData ?? []}
+						musclesError={musclesError}
+						exercises={exercises}
+						exercisesErrorMessage={exercisesError?.message}
+					/>
+					<Button asChild type='button' variant='ghost'>
+						<Link href='/dashboard/workouts'>
+							<ArrowLeft />
+							Back to workouts
+						</Link>
+					</Button>
 				</div>
-				<Card className='w-120'>
-					<CardHeader>
-						<CardTitle>Workout Name</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<AddWorkoutSelectedExercises />
-					</CardContent>
-				</Card>
 			</div>
+			<Card className='w-full max-w-2xl'>
+				<CardHeader>
+					<CardTitle>Workout Name</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<AddWorkoutSelectedExercises />
+				</CardContent>
+			</Card>
 		</div>
 	)
 }
