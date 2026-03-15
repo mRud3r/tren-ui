@@ -199,19 +199,16 @@ export type Database = {
 			workouts: {
 				Row: {
 					description: string | null
-					duration: number
 					id: number
 					name: string
 				}
 				Insert: {
 					description?: string | null
-					duration: number
 					id?: number
 					name: string
 				}
 				Update: {
 					description?: string | null
-					duration?: number
 					id?: number
 					name?: string
 				}

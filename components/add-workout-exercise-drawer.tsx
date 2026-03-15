@@ -26,7 +26,7 @@ export function AddWorkoutExerciseDrawer({ muscles, musclesError, exercises, exe
 	return (
 		<Drawer direction='bottom'>
 			<DrawerTrigger asChild>
-				<Button type='button' variant='secondary'>
+				<Button type='button' variant='outline' className='w-full'>
 					<Plus className='h-4 w-4' />
 					Add exercises
 				</Button>

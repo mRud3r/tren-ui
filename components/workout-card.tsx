@@ -13,7 +13,6 @@ export const WorkoutCard = ({ workout }: { workout: WorkoutCardData }) => {
 			</CardHeader>
 			<CardContent>
 				<div className='text-sm opacity-70 flex gap-3'>
-					{typeof workout.duration === 'number' ? <span>Duration: {workout.duration} min</span> : null}
 					{typeof workout.exerciseCount === 'number' ? <span>{workout.exerciseCount} exercises</span> : null}
 				</div>
 			</CardContent>

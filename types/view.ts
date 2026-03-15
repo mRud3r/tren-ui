@@ -28,7 +28,6 @@ export type WorkoutCardData = {
 	id: WorkoutRow['id']
 	name: WorkoutRow['name']
 	description: WorkoutRow['description']
-	duration: WorkoutRow['duration']
 	exerciseCount: number
 }
 

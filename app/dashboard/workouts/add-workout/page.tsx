@@ -1,10 +1,7 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-
 import { AddWorkoutExerciseDrawer } from '@/components/add-workout-exercise-drawer'
+import { AddWorkoutNameInput } from '@/components/add-workout-name-input'
+import { AddWorkoutSaveButton } from '@/components/add-workout-save-button'
 import { AddWorkoutSelectedExercises } from '@/components/add-workout-selected-exercises'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { isExerciseType } from '@/lib/exerciseTypeIcons'
 import { createClient } from '@/lib/supabase/server'
 import type { ExerciseCardData } from '@/types/view'
@@ -80,29 +77,18 @@ export default async function NewWorkoutPage({
 		<div className='w-full space-y-6 p-4'>
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-medium'>Add Workout</h1>
-				<div className='flex items-center gap-2'>
-					<AddWorkoutExerciseDrawer
-						muscles={musclesData ?? []}
-						musclesError={musclesError}
-						exercises={exercises}
-						exercisesErrorMessage={exercisesError?.message}
-					/>
-					<Button asChild type='button' variant='ghost'>
-						<Link href='/dashboard/workouts'>
-							<ArrowLeft />
-							Back to workouts
-						</Link>
-					</Button>
-				</div>
+				<AddWorkoutSaveButton />
 			</div>
-			<Card className='w-full max-w-2xl'>
-				<CardHeader>
-					<CardTitle>Workout Name</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<AddWorkoutSelectedExercises />
-				</CardContent>
-			</Card>
+			<div className='flex flex-col gap-2'>
+				<AddWorkoutNameInput />
+				<AddWorkoutSelectedExercises />
+			</div>
+			<AddWorkoutExerciseDrawer
+				muscles={musclesData ?? []}
+				musclesError={musclesError}
+				exercises={exercises}
+				exercisesErrorMessage={exercisesError?.message}
+			/>
 		</div>
 	)
 }
