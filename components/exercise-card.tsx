@@ -1,15 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
-import { Plus } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { exerciseTypeConfig } from '@/lib/exerciseTypeIcons'
 import type { ExerciseCardData } from '@/types/view'
 
 export const ExerciseCard = ({
 	exercise,
 	variant = 'default',
+	selected = false,
 }: {
 	exercise: ExerciseCardData
 	variant?: 'default' | 'workout'
+	selected?: boolean
 }) => {
 	const ExerciseTypeIcon = exercise.type ? exerciseTypeConfig[exercise.type].icon : null
 
@@ -20,7 +22,7 @@ export const ExerciseCard = ({
 	} as const
 
 	return (
-		<Card className='shadow-none group hover:border-primary transition-colors'>
+		<Card className={`shadow-none group hover:border-primary transition-colors ${selected ? 'border-primary' : ''}`}>
 			<CardHeader className='flex flex-row items-start justify-between'>
 				<div className='w-full flex flex-row gap-3 items-center'>
 					{ExerciseTypeIcon && (
@@ -34,8 +36,11 @@ export const ExerciseCard = ({
 					</div>
 				</div>
 				{variant === 'workout' && (
-					<div className='p-2 rounded-full bg-accent group-hover:bg-primary group-hover:text-background transition-colors'>
-						<Plus className='w-3 h-3' />
+					<div
+						className={`p-2 rounded-full transition-colors ${
+							selected ? 'bg-primary text-background' : 'bg-accent group-hover:bg-primary group-hover:text-background'
+						}`}>
+						{selected ? <Check className='w-3 h-3' /> : <Plus className='w-3 h-3' />}
 					</div>
 				)}
 			</CardHeader>
