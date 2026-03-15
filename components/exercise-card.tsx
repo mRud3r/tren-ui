@@ -1,8 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
+import { Dumbbell, Heart, PersonStanding, CircleDotDashed, Sword, Plus } from 'lucide-react'
 import type { ExerciseCardData } from '@/types/view'
 
-export const ExerciseCard = ({ exercise }: { exercise: ExerciseCardData }) => {
+export const ExerciseCard = ({
+	exercise,
+	variant = 'default',
+}: {
+	exercise: ExerciseCardData
+	variant?: 'default' | 'workout'
+}) => {
+	const typeIconMap = {
+		strength: <Dumbbell className='w-4 h-4' />,
+		cardio: <Heart className='w-4 h-4' />,
+		flexibility: <PersonStanding className='w-4 h-4' />,
+		core: <CircleDotDashed className='w-4 h-4' />,
+		plyometric: <Sword className='w-4 h-4' />,
+	}
 	const colorMap = {
 		easy: 'bg-green-100 text-green-800 border-green-300',
 		intermediate: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -10,27 +24,23 @@ export const ExerciseCard = ({ exercise }: { exercise: ExerciseCardData }) => {
 	} as const
 
 	return (
-		<Card>
-			<CardHeader>
-				<div className='flex flex-row w-full justify-between items-center'>
-					<CardTitle className='mb-0 text-lg'>{exercise.name}</CardTitle>
-					<Badge className={colorMap[exercise.difficulty]}>{exercise.difficulty}</Badge>
+		<Card className='shadow-none group hover:border-primary transition-colors'>
+			<CardHeader className='flex flex-row items-start justify-between'>
+				<div className='w-full flex flex-row gap-3 items-center'>
+					{exercise.type && <div className='p-2 rounded-full bg-accent'>{typeIconMap[exercise.type]}</div>}
+					<div className='flex flex-col gap-1 items-start'>
+						<CardTitle>{exercise.name}</CardTitle>
+						<span className='text-xs opacity-70'>{exercise.primaryMuscle?.name ?? 'None'}</span>
+					</div>
 				</div>
-				<span className='text-md opacity-70'>Primary: {exercise.primaryMuscle?.name ?? 'None'}</span>
+				{variant === 'workout' && (
+					<div className='p-2 rounded-full bg-accent group-hover:bg-primary group-hover:text-background transition-colors'>
+						<Plus className='w-3 h-3' />
+					</div>
+				)}
 			</CardHeader>
 			<CardContent>
-				{exercise.secondaryMuscles.length > 0 && (
-					<>
-						<span className='text-sm opacity-70'>Secondary muscles:</span>
-						<div className='flex gap-2 mt-1 flex-wrap'>
-							{exercise.secondaryMuscles.map(m => (
-								<Badge key={m.id} variant='outline'>
-									{m.name}
-								</Badge>
-							))}
-						</div>
-					</>
-				)}
+				<Badge className={`${colorMap[exercise.difficulty]} rounded-full`}>{exercise.difficulty}</Badge>
 			</CardContent>
 		</Card>
 	)

@@ -69,7 +69,7 @@ export default async function NewWorkoutPage() {
 					) : (
 						<div className='grid sm:grid-cols-1 xl:grid-cols-2 gap-4'>
 							{exercises.map(ex => (
-								<ExerciseCard key={ex.id} exercise={ex} />
+								<ExerciseCard key={ex.id} exercise={ex} variant='workout' />
 							))}
 						</div>
 					)}
