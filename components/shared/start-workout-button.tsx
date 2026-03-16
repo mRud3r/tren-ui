@@ -18,8 +18,6 @@ export function StartWorkoutButton({ workoutId }: { workoutId: number }) {
 				.from('workout_session')
 				.insert({
 					workout_id: workoutId,
-					started_at: new Date().toISOString(),
-					status: 'started',
 				})
 				.select()
 				.single()

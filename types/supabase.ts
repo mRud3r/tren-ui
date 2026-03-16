@@ -75,6 +75,41 @@ export type Database = {
 					},
 				]
 			}
+			exercise_set: {
+				Row: {
+					created_at: string
+					id: number
+					inensity: number | null
+					reps: number | null
+					session_id: number
+					weight: number | null
+				}
+				Insert: {
+					created_at?: string
+					id?: number
+					inensity?: number | null
+					reps?: number | null
+					session_id: number
+					weight?: number | null
+				}
+				Update: {
+					created_at?: string
+					id?: number
+					inensity?: number | null
+					reps?: number | null
+					session_id?: number
+					weight?: number | null
+				}
+				Relationships: [
+					{
+						foreignKeyName: 'exercise_set_session_id_fkey'
+						columns: ['session_id']
+						isOneToOne: false
+						referencedRelation: 'exercise_session'
+						referencedColumns: ['id']
+					},
+				]
+			}
 			exercises: {
 				Row: {
 					difficulty: Database['public']['Enums']['difficulty_level']
@@ -163,27 +198,18 @@ export type Database = {
 			}
 			workout_session: {
 				Row: {
-					duration: number | null
-					finished_at: string | null
+					created_at: string | null
 					id: number
-					started_at: string
-					status: Database['public']['Enums']['session_status'] | null
 					workout_id: number
 				}
 				Insert: {
-					duration?: number | null
-					finished_at?: string | null
+					created_at?: string | null
 					id?: number
-					started_at?: string
-					status?: Database['public']['Enums']['session_status'] | null
 					workout_id: number
 				}
 				Update: {
-					duration?: number | null
-					finished_at?: string | null
+					created_at?: string | null
 					id?: number
-					started_at?: string
-					status?: Database['public']['Enums']['session_status'] | null
 					workout_id?: number
 				}
 				Relationships: [
@@ -198,16 +224,19 @@ export type Database = {
 			}
 			workouts: {
 				Row: {
+					created_at: string | null
 					description: string | null
 					id: number
 					name: string
 				}
 				Insert: {
+					created_at?: string | null
 					description?: string | null
 					id?: number
 					name: string
 				}
 				Update: {
+					created_at?: string | null
 					description?: string | null
 					id?: number
 					name?: string

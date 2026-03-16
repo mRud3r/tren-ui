@@ -14,8 +14,7 @@ export default async function DashboardPage() {
 		.select(
 			`
     id,
-    status,
-    finished_at,
+			created_at,
     workout_id,
     workout:workouts (
       id,
@@ -24,7 +23,7 @@ export default async function DashboardPage() {
     )
   `,
 		)
-		.order('finished_at', { ascending: false })
+		.order('created_at', { ascending: false })
 		.limit(1)
 		.single()
 
@@ -33,7 +32,7 @@ export default async function DashboardPage() {
 			<h1 className='text-2xl font-medium'>Dashboard</h1>
 
 			<section className='rounded-lg border p-4'>
-				<h2 className='text-lg font-medium mb-2'>Last completed workout</h2>
+				<h2 className='text-lg font-medium mb-2'>Last workout session</h2>
 
 				{!lastSession ? (
 					<p className='text-sm opacity-60'>No completed workouts yet.</p>
@@ -44,9 +43,7 @@ export default async function DashboardPage() {
 						{lastSession.workout.description && <p className='text-sm opacity-70'>{lastSession.workout.description}</p>}
 
 						<div className='text-xs opacity-60 flex gap-3'>
-							{lastSession.finished_at && (
-								<span>Finished: {new Date(lastSession.finished_at).toLocaleDateString()}</span>
-							)}
+							{lastSession.created_at && <span>Date: {new Date(lastSession.created_at).toLocaleDateString()}</span>}
 						</div>
 					</div>
 				)}

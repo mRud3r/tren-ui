@@ -15,30 +15,44 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 		try {
 			setLoading(true)
 
-			const exercises = useWorkoutSessionStore.getState().exercises
+			const exercises = Object.values(useWorkoutSessionStore.getState().exercises)
 
-			const rows = Object.values(exercises).map(ex => ({
-				session_id: Number(sessionId),
-				exercise_id: ex.exerciseId,
-				sets: ex.sets,
-				notes: ex.notes ?? null,
-			}))
+			if (exercises.length > 0) {
+				const exerciseRows = exercises.map(exercise => ({
+					session_id: Number(sessionId),
+					exercise_id: exercise.exerciseId,
+					notes: exercise.notes ?? null,
+				}))
 
-			if (rows.length > 0) {
-				const { error: exerciseError } = await supabase.from('exercise_session').insert(rows)
+				const { data: insertedExerciseSessions, error: exerciseSessionError } = await supabase
+					.from('exercise_session')
+					.insert(exerciseRows)
+					.select('id, exercise_id')
 
-				if (exerciseError) throw exerciseError
+				if (exerciseSessionError) throw exerciseSessionError
+
+				const exercisesById = new Map(exercises.map(exercise => [exercise.exerciseId, exercise]))
+
+				const setRows = (insertedExerciseSessions ?? []).flatMap(insertedSession => {
+					const exercise = exercisesById.get(insertedSession.exercise_id)
+
+					if (!exercise) return []
+
+					return exercise.sets.map(set => ({
+						session_id: insertedSession.id,
+						reps: set.reps,
+						weight: set.weight ?? null,
+						inensity: set.intensity ?? null,
+					}))
+				})
+
+				if (setRows.length > 0) {
+					const { error: exerciseSetError } = await supabase.from('exercise_set').insert(setRows)
+
+					if (exerciseSetError) throw exerciseSetError
+				}
 			}
 
-			const { error } = await supabase
-				.from('workout_session')
-				.update({
-					status: 'completed',
-					finished_at: new Date().toISOString(),
-				})
-				.eq('id', Number(sessionId))
-
-			if (error) throw error
 			useWorkoutSessionStore.getState().clear()
 			setFinished(true)
 		} catch (err) {

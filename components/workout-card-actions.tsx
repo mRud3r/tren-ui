@@ -36,6 +36,28 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 			const sessionIds = (sessions ?? []).map(session => session.id)
 
 			if (sessionIds.length > 0) {
+				const { data: exerciseSessions, error: exerciseSessionsFetchError } = await supabase
+					.from('exercise_session')
+					.select('id')
+					.in('session_id', sessionIds)
+
+				if (exerciseSessionsFetchError) {
+					throw exerciseSessionsFetchError
+				}
+
+				const exerciseSessionIds = (exerciseSessions ?? []).map(exerciseSession => exerciseSession.id)
+
+				if (exerciseSessionIds.length > 0) {
+					const { error: exerciseSetDeleteError } = await supabase
+						.from('exercise_set')
+						.delete()
+						.in('session_id', exerciseSessionIds)
+
+					if (exerciseSetDeleteError) {
+						throw exerciseSetDeleteError
+					}
+				}
+
 				const { error: exerciseSessionDeleteError } = await supabase
 					.from('exercise_session')
 					.delete()
