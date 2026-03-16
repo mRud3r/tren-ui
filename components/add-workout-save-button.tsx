@@ -7,6 +7,7 @@ import { Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useCreateWorkoutStore } from '@/stores/createWorkout.store'
+import type { ExerciseCardData } from '@/types/view'
 
 export function AddWorkoutSaveButton() {
 	const router = useRouter()
@@ -14,12 +15,20 @@ export function AddWorkoutSaveButton() {
 
 	const name = useCreateWorkoutStore(state => state.name)
 	const exercisesMap = useCreateWorkoutStore(state => state.exercises)
+	const exerciseOrder = useCreateWorkoutStore(state => state.exerciseOrder)
 	const clear = useCreateWorkoutStore(state => state.clear)
 
 	const [loading, setLoading] = useState(false)
 	const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-	const selectedExercises = Object.values(exercisesMap)
+	const orderedExercises = exerciseOrder
+		.map(exerciseId => exercisesMap[exerciseId])
+		.filter((exercise): exercise is ExerciseCardData => Boolean(exercise))
+
+	const selectedExercises = [
+		...orderedExercises,
+		...Object.values(exercisesMap).filter(exercise => !exerciseOrder.includes(exercise.id)),
+	]
 	const canSave = name.trim().length > 0 && selectedExercises.length > 0 && !loading
 
 	async function saveWorkout() {
