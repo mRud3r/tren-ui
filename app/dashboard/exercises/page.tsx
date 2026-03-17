@@ -26,7 +26,6 @@ export default async function ExcersisesPage({
 		`
       id,
       exercise_name,
-      difficulty,
       primaryMuscle:muscle_groups!exercises_primary_muscle_id_fkey ( id, name ),
       secondary_muscle_ids,
 	  type
@@ -71,7 +70,6 @@ export default async function ExcersisesPage({
 		return {
 			id: item.id,
 			name: item.exercise_name,
-			difficulty: item.difficulty,
 			primaryMuscle: primary ? { id: primary.id, name: primary.name } : null,
 			secondaryMuscles: secondaryMusclesObjects,
 			type: item.type,
@@ -81,7 +79,6 @@ export default async function ExcersisesPage({
 	return (
 		<div className='w-full space-y-6 p-4'>
 			<h1 className='text-2xl font-medium'>Exercise Library</h1>
-			<p>Browse and learn proper form for exercises</p>
 			<ExerciseSearch muscles={muscleData ?? []} musclesError={musclesError} />
 			{exercises.length === 0 ? (
 				<div className='text-sm opacity-70'>No exercises available</div>

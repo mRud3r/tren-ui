@@ -1,24 +1,21 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardAction } from './ui/card'
 import { StartWorkoutButton } from './shared/start-workout-button'
 import type { WorkoutCardData } from '@/types/view'
 import { WorkoutCardActions } from './workout-card-actions'
 
 export const WorkoutCard = ({ workout }: { workout: WorkoutCardData }) => {
 	return (
-		<Card>
-			<CardHeader>
-				<div className='flex flex-row w-full justify-between items-center'>
-					<CardTitle>{workout.name}</CardTitle>
+		<Card className='px-5 py-3 gap-0'>
+			<CardHeader className='px-0'>
+				<CardTitle className='mt-3'>{workout.name}</CardTitle>
+				<CardAction>
 					<WorkoutCardActions workoutId={workout.id} />
-				</div>
-				{workout.description ? <span className='text-sm opacity-80'>{workout.description}</span> : null}
+				</CardAction>
 			</CardHeader>
-			<CardContent>
-				<div className='text-sm opacity-70 flex gap-3'>
+			<CardContent className='px-0 text-sm text-muted-foreground'>
 					{typeof workout.exerciseCount === 'number' ? <span>{workout.exerciseCount} exercises</span> : null}
-				</div>
 			</CardContent>
-			<CardFooter>
+			<CardFooter className='px-0 mb-2 mt-6'>
 				<StartWorkoutButton workoutId={workout.id} />
 			</CardFooter>
 		</Card>

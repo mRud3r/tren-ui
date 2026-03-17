@@ -11,7 +11,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { Button } from './ui/button'
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
 import { exerciseTypeConfig, exerciseTypes, isExerciseType } from '@/lib/exerciseTypeIcons'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { MuscleGroup } from '@/types/view'
@@ -37,7 +37,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-2'>
 			<div className='flex gap-2'>
 				<InputGroup>
 					<InputGroupInput
@@ -75,31 +75,34 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 					</SelectContent>
 				</Select>
 			</div>
-			<div className='flex flex-wrap gap-3'>
-				<Button
-					variant={activeType === null ? 'default' : 'outline'}
-					type='button'
-					onClick={() => setParam('type', undefined)}>
-					<LayoutGrid className='h-4 w-4' />
+			<ToggleGroup
+				type='single'
+				value={activeType ?? '__all__'}
+				spacing={2}
+				variant='outline'
+				onValueChange={value => {
+					if (!value || value === '__all__') {
+						setParam('type', undefined)
+					} else {
+						setParam('type', value)
+					}
+				}}>
+				<ToggleGroupItem value='__all__' aria-label='All categories'>
+					<LayoutGrid className='h-2 w-2' />
 					All Categories
-				</Button>
+				</ToggleGroupItem>
 
 				{exerciseTypes.map(type => {
 					const Icon = exerciseTypeConfig[type].icon
-					const active = activeType === type
 
 					return (
-						<Button
-							key={type}
-							variant={active ? 'default' : 'outline'}
-							type='button'
-							onClick={() => setParam('type', type)}>
-							<Icon className='h-4 w-4' />
+						<ToggleGroupItem key={type} value={type} aria-label={exerciseTypeConfig[type].label}>
+							<Icon className='h-2 w-2' />
 							{exerciseTypeConfig[type].label}
-						</Button>
+						</ToggleGroupItem>
 					)
 				})}
-			</div>
+			</ToggleGroup>
 		</div>
 	)
 }

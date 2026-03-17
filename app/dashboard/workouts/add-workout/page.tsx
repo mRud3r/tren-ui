@@ -27,7 +27,6 @@ export default async function NewWorkoutPage({
 		`
       id,
       exercise_name,
-      difficulty,
       primaryMuscle:muscle_groups!exercises_primary_muscle_id_fkey ( id, name ),
       secondary_muscle_ids,
 	  type
@@ -66,7 +65,6 @@ export default async function NewWorkoutPage({
 		return {
 			id: item.id,
 			name: item.exercise_name,
-			difficulty: item.difficulty,
 			primaryMuscle: primary ? { id: primary.id, name: primary.name } : null,
 			secondaryMuscles: secondaryMusclesObjects,
 			type: item.type,
@@ -76,19 +74,19 @@ export default async function NewWorkoutPage({
 	return (
 		<div className='w-full space-y-6 p-4'>
 			<div className='flex items-center justify-between'>
-				<h1 className='text-2xl font-medium'>Add Workout</h1>
-				<AddWorkoutSaveButton />
+				<h1 className='text-2xl font-medium'>New Workout</h1>
+				<AddWorkoutExerciseDrawer
+					muscles={musclesData ?? []}
+					musclesError={musclesError}
+					exercises={exercises}
+					exercisesErrorMessage={exercisesError?.message}
+				/>
 			</div>
 			<div className='flex flex-col gap-2'>
 				<AddWorkoutNameInput />
 				<AddWorkoutSelectedExercises />
 			</div>
-			<AddWorkoutExerciseDrawer
-				muscles={musclesData ?? []}
-				musclesError={musclesError}
-				exercises={exercises}
-				exercisesErrorMessage={exercisesError?.message}
-			/>
+			<AddWorkoutSaveButton />
 		</div>
 	)
 }

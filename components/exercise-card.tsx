@@ -3,6 +3,7 @@ import { Badge } from './ui/badge'
 import { Check, Plus } from 'lucide-react'
 import { exerciseTypeConfig } from '@/lib/exerciseTypeIcons'
 import type { ExerciseCardData } from '@/types/view'
+import { Item, ItemActions, ItemContent, ItemMedia } from './ui/item'
 
 export const ExerciseCard = ({
 	exercise,
@@ -15,38 +16,32 @@ export const ExerciseCard = ({
 }) => {
 	const ExerciseTypeIcon = exercise.type ? exerciseTypeConfig[exercise.type].icon : null
 
-	const colorMap = {
-		easy: 'bg-green-100 text-green-800 border-green-300',
-		intermediate: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-		hard: 'bg-red-100 text-red-800 border-red-300',
-	} as const
-
 	return (
-		<Card className={`shadow-none group hover:border-primary transition-colors ${selected ? 'border-primary' : ''}`}>
-			<CardHeader className='flex flex-row items-start justify-between'>
-				<div className='w-full flex flex-row gap-3 items-center'>
-					{ExerciseTypeIcon && (
-						<div className='p-2 rounded-full bg-accent'>
-							<ExerciseTypeIcon className='w-4 h-4' />
-						</div>
-					)}
-					<div className='flex flex-col gap-1 items-start'>
-						<CardTitle>{exercise.name}</CardTitle>
-						<span className='text-xs opacity-70'>{exercise.primaryMuscle?.name ?? 'None'}</span>
+		<Item
+			variant='outline'
+			className={`shadow-none group hover:border-primary transition-colors ${selected ? 'border-primary' : ''}`}>
+			{ExerciseTypeIcon && (
+				<ItemMedia>
+					<div className='p-2 rounded-full bg-accent'>
+						<ExerciseTypeIcon className='w-4 h-4' />
 					</div>
-				</div>
-				{variant === 'workout' && (
+				</ItemMedia>
+			)}
+
+			<ItemContent>
+				<CardTitle>{exercise.name}</CardTitle>
+				<span className='text-xs opacity-70'>{exercise.primaryMuscle?.name ?? 'None'}</span>
+			</ItemContent>
+			{variant === 'workout' && (
+				<ItemActions>
 					<div
 						className={`p-2 rounded-full transition-colors ${
 							selected ? 'bg-primary text-background' : 'bg-accent group-hover:bg-primary group-hover:text-background'
 						}`}>
 						{selected ? <Check className='w-3 h-3' /> : <Plus className='w-3 h-3' />}
 					</div>
-				)}
-			</CardHeader>
-			<CardContent>
-				<Badge className={`${colorMap[exercise.difficulty]} rounded-full`}>{exercise.difficulty}</Badge>
-			</CardContent>
-		</Card>
+				</ItemActions>
+			)}
+		</Item>
 	)
 }

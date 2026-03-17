@@ -14,7 +14,6 @@ export type MuscleGroup = {
 export type ExerciseCardData = {
 	id: ExerciseRow['id']
 	name: ExerciseRow['exercise_name']
-	difficulty: Enums<'difficulty_level'>
 	primaryMuscle: MuscleGroup | null
 	secondaryMuscles: MuscleGroup[]
 	type: ExerciseType | null
@@ -31,4 +30,4 @@ export type WorkoutCardData = {
 	exerciseCount: number
 }
 
-export type WorkoutExercise = Pick<ExerciseCardData, 'id' | 'name' | 'difficulty'>
+export type WorkoutExercise = Pick<ExerciseCardData, 'id' | 'name' >

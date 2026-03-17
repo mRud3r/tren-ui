@@ -26,7 +26,6 @@ export default async function EditWorkoutPage({ params }: { params: Promise<{ id
 		<div className='w-full space-y-6 p-4'>
 			<div className='space-y-1'>
 				<h1 className='text-2xl font-medium'>Edit Workout</h1>
-				<p className='text-sm text-muted-foreground'>Update workout details and save your changes.</p>
 			</div>
 			<EditWorkoutForm workout={workout} />
 		</div>

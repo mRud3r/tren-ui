@@ -27,8 +27,7 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 			`
 	exercise:exercises (
 	  id,
-	  exercise_name,
-	  difficulty
+	  exercise_name
 	)
   `,
 		)
@@ -37,8 +36,7 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 	const exercises =
 		workoutExercises?.map(item => ({
 			id: item.exercise.id,
-			name: item.exercise.exercise_name,
-			difficulty: item.exercise.difficulty,
+			name: item.exercise.exercise_name
 		})) ?? []
 
 	return (

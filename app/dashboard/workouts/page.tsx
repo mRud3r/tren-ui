@@ -15,7 +15,6 @@ export default async function WorkoutsPage() {
 					</Link>
 				</Button>
 			</div>
-			<p>Create and manage your training routines</p>
 			<WorkoutsList />
 		</div>
 	)

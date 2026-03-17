@@ -74,8 +74,8 @@ export function AddWorkoutSaveButton() {
 	}
 
 	return (
-		<div className='flex flex-col items-end gap-1'>
-			<Button type='button' onClick={saveWorkout} disabled={!canSave}>
+		<div className='flex flex-col items-start gap-1'>
+			<Button type='button' variant='secondary' onClick={saveWorkout} disabled={!canSave}>
 				<Save className='h-4 w-4' />
 				{loading ? 'Saving...' : 'Save workout'}
 			</Button>

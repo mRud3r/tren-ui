@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { useCreateWorkoutStore } from '@/stores/createWorkout.store'
 import { exerciseTypeConfig } from '@/lib/exerciseTypeIcons'
 import type { ExerciseCardData } from '@/types/view'
+import { Item, ItemActions, ItemContent, ItemMedia } from './ui/item'
 
 type SortableExerciseItemProps = {
 	exercise: ExerciseCardData
@@ -43,36 +44,35 @@ function SortableExerciseItem({ exercise, onRemove }: SortableExerciseItemProps)
 				transform: CSS.Transform.toString(transform),
 				transition,
 			}}
-			className={`w-full flex items-center justify-between gap-3 rounded-lg border p-2 bg-background ${
-				isDragging ? 'opacity-80 shadow-sm' : ''
-			}`}>
-			<div className='flex gap-4 items-center'>
-				<button
-					type='button'
-					className='cursor-grab active:cursor-grabbing p-1 touch-none'
-					aria-label={`Move ${exercise.name}`}
-					{...attributes}
-					{...listeners}>
-					<GripVertical className='h-4 w-4' />
-				</button>
-				<div className='flex gap-2 items-center'>
-					<div className='p-2 rounded-full bg-accent'>
-						{ExerciseTypeIcon && <ExerciseTypeIcon className='w-4 h-4' />}
-					</div>
-					<div>
-						<p className='text-sm font-medium leading-none flex items-center gap-2'>{exercise.name}</p>
-						<p className='text-xs text-muted-foreground mt-1'>{exercise.primaryMuscle?.name ?? 'No muscle group'}</p>
-					</div>
-				</div>
-			</div>
-			<Button
+			className={`w-full flex items-center gap-2 bg-background ${isDragging ? 'opacity-80 shadow-sm' : ''}`}>
+			<button
 				type='button'
-				variant='ghost'
-				size='icon'
-				onClick={() => onRemove(exercise.id)}
-				aria-label={`Remove ${exercise.name} from workout`}>
-				<X className='h-4 w-4' />
-			</Button>
+				className='cursor-grab active:cursor-grabbing p-1 touch-none opacity-30 active:opacity-100 hover:opacity-100 transition-opacity'
+				aria-label={`Move ${exercise.name}`}
+				{...attributes}
+				{...listeners}>
+				<GripVertical className='h-6 w-6' />
+			</button>
+			<Item variant='outline' size='sm' className='w-full flex items-center justify-between'>
+				<ItemMedia className='p-2 rounded-full bg-accent'>
+					{ExerciseTypeIcon && <ExerciseTypeIcon className='w-4 h-4' />}
+				</ItemMedia>
+				<ItemContent>
+					<p className='text-sm font-medium leading-none flex items-center gap-2'>{exercise.name}</p>
+					<p className='text-xs text-muted-foreground mt-1'>{exercise.primaryMuscle?.name ?? 'No muscle group'}</p>
+				</ItemContent>
+				<ItemActions>
+					<Button
+						type='button'
+						variant='outline'
+						className='rounded-full'
+						size='icon'
+						onClick={() => onRemove(exercise.id)}
+						aria-label={`Remove ${exercise.name} from workout`}>
+						<X className='h-4 w-4' />
+					</Button>
+				</ItemActions>
+			</Item>
 		</div>
 	)
 }
@@ -117,7 +117,7 @@ export function AddWorkoutSelectedExercises() {
 	}
 
 	if (selectedExercises.length === 0) {
-		return <p className='text-sm text-muted-foreground'>No exercises selected yet.</p>
+		return <p className='text-sm text-muted-foreground w-full text-center mt-8'>No exercises selected yet.</p>
 	}
 
 	return (
