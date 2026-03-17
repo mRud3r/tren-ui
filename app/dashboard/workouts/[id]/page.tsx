@@ -1,5 +1,5 @@
 import FinishWorkoutButton from '@/components/shared/finish-workout-button'
-import WorkoutExerciseCard from '@/components/shared/workout-exercise-card'
+import WorkoutExercisesList from '@/components/shared/workout-exercises-list'
 import { createClient } from '@/lib/supabase/server'
 import { Calendar } from 'lucide-react'
 
@@ -34,6 +34,13 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 		)
 		.eq('workout_id', session.workout_id)
 
+	const exercises =
+		workoutExercises?.map(item => ({
+			id: item.exercise.id,
+			name: item.exercise.exercise_name,
+			difficulty: item.exercise.difficulty,
+		})) ?? []
+
 	return (
 		<div className='w-full space-y-6 p-4'>
 			<div className='flex items-center justify-between'>
@@ -47,16 +54,7 @@ export default async function WorkoutPage({ params }: { params: Promise<{ id: st
 				<FinishWorkoutButton sessionId={id} />
 			</div>
 
-			{workoutExercises?.map(item => (
-				<WorkoutExerciseCard
-					key={item.exercise.id}
-					exercise={{
-						id: item.exercise.id,
-						name: item.exercise.exercise_name,
-						difficulty: item.exercise.difficulty,
-					}}
-				/>
-			))}
+			<WorkoutExercisesList exercises={exercises} />
 		</div>
 	)
 }

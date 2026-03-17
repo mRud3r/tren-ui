@@ -4,6 +4,7 @@ type SetEntry = {
 	reps: number
 	weight?: number
 	intensity?: number
+	completed?: boolean
 }
 
 type ExerciseState = {
