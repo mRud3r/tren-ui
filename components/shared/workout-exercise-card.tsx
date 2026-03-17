@@ -1,15 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
-import { Textarea } from '../ui/textarea'
 import { Slider } from '../ui/slider'
-import { Switch } from '../ui/switch'
-import { Trash, Plus } from 'lucide-react'
+import { Trash, Plus, ChevronDown } from 'lucide-react'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { WorkoutExercise } from '@/types/view'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
+import { Checkbox } from '../ui/checkbox'
 
 type SetData = {
 	reps: number
@@ -25,8 +24,6 @@ export default function WorkoutExerciseCard({ exercise }: { exercise: WorkoutExe
 		{ reps: 0, weight: 0, intensity: 5 },
 		{ reps: 0, weight: 0, intensity: 5 },
 	])
-	const [notes, setNotes] = useState('')
-	const [showNotes, setShowNotes] = useState(false)
 
 	const completedSets = sets.filter(set => set.reps > 0).length
 
@@ -38,7 +35,6 @@ export default function WorkoutExerciseCard({ exercise }: { exercise: WorkoutExe
 		upsertExercise({
 			exerciseId: exercise.id,
 			sets: newSets,
-			notes: notes || undefined,
 		})
 	}
 
@@ -49,7 +45,6 @@ export default function WorkoutExerciseCard({ exercise }: { exercise: WorkoutExe
 		upsertExercise({
 			exerciseId: exercise.id,
 			sets: newSets,
-			notes: notes || undefined,
 		})
 	}
 
@@ -62,81 +57,73 @@ export default function WorkoutExerciseCard({ exercise }: { exercise: WorkoutExe
 		upsertExercise({
 			exerciseId: exercise.id,
 			sets: newSets,
-			notes: notes || undefined,
-		})
-	}
-
-	const updateNotes = (value: string) => {
-		setNotes(value)
-		upsertExercise({
-			exerciseId: exercise.id,
-			sets,
-			notes: value || undefined,
 		})
 	}
 
 	return (
 		<div className='space-y-2'>
-			<div className='flex items-center gap-2'>
-				<h3 className='text-xl font-medium'>{exercise.name ?? 'Unnamed Exercise'}</h3>
-				<p className='text-xs text-muted-foreground'>
-					{completedSets} / {sets.length} sets completed
-				</p>
-			</div>
-			{sets.map((set, index) => (
-				<div key={index} className='flex gap-8 items-center'>
-					<Input
-						type='number'
-						placeholder='Reps'
-						value={set.reps || ''}
-						onChange={e => updateSet(index, 'reps', Number(e.target.value))}
-					/>
-					<Input
-						type='number'
-						placeholder='Weight'
-						value={set.weight || ''}
-						onChange={e => updateSet(index, 'weight', Number(e.target.value))}
-					/>
-					<div className='grid w-full gap-1'>
-						<div className='flex items-center justify-between gap-2'>
-							<Label className='text-muted-foreground'>Intensity</Label>
-							<span className='text-muted-foreground text-sm'>{set.intensity}</span>
-						</div>
-						<Slider
-							value={[set.intensity]}
-							onValueChange={([value]) => updateSet(index, 'intensity', value)}
-							max={10}
-							min={1}
-							step={1}
-						/>
-					</div>
-					<button onClick={() => removeSet(index)} disabled={sets.length === 1} className='disabled:opacity-30'>
-						<Trash className='h-6 w-6' />
-					</button>
+			<Button variant='ghost' className='flex items-center gap-2 w-full justify-start'>
+				<ChevronDown className='h-4 w-4' />
+				<div className='w-full flex items-center justify-between'>
+					<h3 className='text-lg font-medium'>{exercise.name ?? 'Unnamed Exercise'}</h3>
+					<p className='text-xs text-muted-foreground'>
+						{completedSets} / {sets.length}
+					</p>
 				</div>
-			))}
-
-			<Button variant='outline' className='w-full mt-2 opacity-60 border-dashed' onClick={addSet}>
-				Add set <Plus />
 			</Button>
-
-			<div className='flex items-center mt-2 gap-4'>
-				<Label htmlFor={`notes-toggle-${exercise.id}`} className='text-muted-foreground cursor-pointer'>
-					Add exercise notes
-				</Label>
-				<Switch id={`notes-toggle-${exercise.id}`} checked={showNotes} onCheckedChange={setShowNotes} size='sm' />
-			</div>
-
-			{showNotes && (
-				<div className='mt-4'>
-					<Textarea
-						placeholder='Type your notes here...'
-						className='mt-1'
-						value={notes}
-						onChange={e => updateNotes(e.target.value)}
-					/>
+			<div className='flex gap-4 ms-5'>
+				<div className='w-px self-stretch bg-accent rounded' />
+				<div className='w-full flex flex-col gap-6 items-start pt-2'>
+					{sets.map((set, index) => (
+						<div key={index} className='flex gap-4 items-start justify-between w-full'>
+							<Checkbox />
+							<div className='flex flex-col gap-2 w-full'>
+								<div className='flex items-center gap-4 w-full'>
+									<InputGroup className='max-w-40'>
+										<InputGroupInput
+											type='number'
+											value={set.reps || ''}
+											onChange={e => updateSet(index, 'reps', Number(e.target.value))}
+										/>
+										<InputGroupAddon align='inline-end'>reps</InputGroupAddon>
+									</InputGroup>
+									<InputGroup className='max-w-40'>
+										<InputGroupInput
+											type='number'
+											value={set.weight || ''}
+											onChange={e => updateSet(index, 'weight', Number(e.target.value))}
+										/>
+										<InputGroupAddon align='inline-end'>kg</InputGroupAddon>
+									</InputGroup>
+								</div>
+								<div className='grid w-full gap-1'>
+									<div className='flex items-center justify-between gap-2'>
+										<Label className='text-muted-foreground'>Intensity</Label>
+										<span className='text-muted-foreground text-sm'>{set.intensity}</span>
+									</div>
+									<Slider
+										value={[set.intensity]}
+										onValueChange={([value]) => updateSet(index, 'intensity', value)}
+										max={10}
+										min={1}
+										step={1}
+									/>
+								</div>
+							</div>
+							<Button
+								variant='ghost'
+								onClick={() => removeSet(index)}
+								disabled={sets.length === 1}
+								className='disabled:opacity-30'>
+								<Trash className='h-4 w-4' />
+							</Button>
+						</div>
+					))}
+					<Button size='sm' variant='ghost' className='opacity-60 hover:opacity-100 transition-all' onClick={addSet}>
+						<Plus /> Add set
+					</Button>
 				</div>
-			)}
+			</div>
 		</div>
 	)
 }
