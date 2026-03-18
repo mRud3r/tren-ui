@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
@@ -29,6 +29,16 @@ const DEFAULT_SETS_PER_EXERCISE = 3
 export default function WorkoutSessionHeader({ workoutId, workoutLabel, exercises }: WorkoutSessionHeaderProps) {
 	const router = useRouter()
 	const exerciseState = useWorkoutSessionStore(s => s.exercises)
+	const setActiveWorkout = useWorkoutSessionStore(s => s.setActiveWorkout)
+	const clearWorkoutSession = useWorkoutSessionStore(s => s.clear)
+
+	useEffect(() => {
+		const numericWorkoutId = Number(workoutId)
+
+		if (!Number.isFinite(numericWorkoutId) || numericWorkoutId <= 0) return
+
+		setActiveWorkout(numericWorkoutId)
+	}, [workoutId, setActiveWorkout])
 
 	const progress = useMemo(() => {
 		const totalSets = exercises.reduce((sum, exercise) => {
@@ -64,7 +74,13 @@ export default function WorkoutSessionHeader({ workoutId, workoutLabel, exercise
 						<p>Are you sure you want to leave the workout session?</p>
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={() => router.push('/dashboard/workouts')}>Continue</AlertDialogAction>
+							<AlertDialogAction
+								onClick={() => {
+									clearWorkoutSession()
+									router.push('/dashboard/workouts')
+								}}>
+								Continue
+							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>

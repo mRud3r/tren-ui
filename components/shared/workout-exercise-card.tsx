@@ -1,18 +1,10 @@
 'use client'
 
-import { useState, type ComponentProps } from 'react'
+import { useEffect, useState, type ComponentProps } from 'react'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group'
-import {
-	Trash,
-	Plus,
-	ChevronDown,
-	EllipsisVertical,
-	GripVertical,
-	Check,
-	CircleCheckBig,
-} from 'lucide-react'
+import { Trash, Plus, ChevronDown, EllipsisVertical, GripVertical, Check, CircleCheckBig } from 'lucide-react'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { WorkoutExercise } from '@/types/view'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
@@ -25,7 +17,19 @@ type SetData = {
 	completed: boolean
 }
 
+const DEFAULT_SET = { reps: 0, weight: 0, intensity: 0, completed: false }
+const DEFAULT_SET_COUNT = 3
+
 const INTENSITY_LEVELS = Array.from({ length: 10 }, (_, index) => index + 1)
+
+const createDefaultSets = () => Array.from({ length: DEFAULT_SET_COUNT }, () => ({ ...DEFAULT_SET }))
+
+const normalizeSet = (set?: Partial<SetData>): SetData => ({
+	reps: set?.reps ?? 0,
+	weight: set?.weight ?? 0,
+	intensity: set?.intensity ?? 0,
+	completed: Boolean(set?.completed),
+})
 
 type WorkoutExerciseCardProps = {
 	exercise: WorkoutExercise
@@ -45,12 +49,23 @@ export default function WorkoutExerciseCard({
 	isDragging = false,
 }: WorkoutExerciseCardProps) {
 	const upsertExercise = useWorkoutSessionStore(s => s.upsertExercise)
+	const storedSets = useWorkoutSessionStore(s => s.exercises[exercise.id]?.sets)
 
-	const [sets, setSets] = useState<SetData[]>([
-		{ reps: 0, weight: 0, intensity: 0, completed: false },
-		{ reps: 0, weight: 0, intensity: 0, completed: false },
-		{ reps: 0, weight: 0, intensity: 0, completed: false },
-	])
+	const [sets, setSets] = useState<SetData[]>(() => {
+		if (storedSets && storedSets.length > 0) {
+			return storedSets.map(set => normalizeSet(set))
+		}
+
+		return createDefaultSets()
+	})
+
+	useEffect(() => {
+		if (!storedSets || storedSets.length === 0) {
+			return
+		}
+
+		setSets(storedSets.map(set => normalizeSet(set)))
+	}, [storedSets])
 
 	const completedSets = sets.filter(set => set.completed).length
 	const isExerciseCompleted = sets.length > 0 && completedSets === sets.length
