@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState, type ComponentProps } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group'
-import { Trash, Plus, ChevronDown, EllipsisVertical, GripVertical, Check, CircleCheckBig } from 'lucide-react'
+import { Trash, Plus, ChevronDown, EllipsisVertical, Check, CircleCheckBig } from 'lucide-react'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { WorkoutExercise } from '@/types/view'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
@@ -36,8 +36,6 @@ type WorkoutExerciseCardProps = {
 	isOpen: boolean
 	onOpenChange: (isOpen: boolean) => void
 	onExerciseCompleted: () => void
-	dragHandleProps?: ComponentProps<'button'>
-	isDragging?: boolean
 }
 
 export default function WorkoutExerciseCard({
@@ -45,8 +43,6 @@ export default function WorkoutExerciseCard({
 	isOpen,
 	onOpenChange,
 	onExerciseCompleted,
-	dragHandleProps,
-	isDragging = false,
 }: WorkoutExerciseCardProps) {
 	const upsertExercise = useWorkoutSessionStore(s => s.upsertExercise)
 	const storedSets = useWorkoutSessionStore(s => s.exercises[exercise.id]?.sets)
@@ -129,112 +125,112 @@ export default function WorkoutExerciseCard({
 	}
 
 	return (
-		<div className={`flex ${isDragging ? 'opacity-80 shadow-sm' : ''}`}>
-			<button
-				type='button'
-				className='cursor-grab active:cursor-grabbing touch-none opacity-30 active:opacity-100 hover:opacity-100 transition-opacity self-start'
-				aria-label={`Move ${exercise.name ?? 'exercise'}`}
-				{...dragHandleProps}>
-				<GripVertical className='md:h-6 md:w-6 h-4 w-4' />
-			</button>
-			<div className='w-full'>
-				<Button
-					variant='ghost'
-					className={`flex items-center gap-2 w-full justify-start ${
-						isExerciseCompleted
-							? 'bg-green-100/70 text-green-900 hover:bg-green-100 border border-green-300/70 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800'
-							: ''
+		<div className='w-full'>
+			<Button
+				variant='ghost'
+				className={`h-14 flex items-center gap-2 w-full justify-start px-2 md:px-4 ${
+					isExerciseCompleted
+						? 'bg-green-100/70 text-green-900 hover:bg-green-100 border border-green-300/70 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800'
+						: ''
+				}`}
+				onClick={() => onOpenChange(!isOpen)}>
+				<ChevronDown
+					className={`h-4 w-4 transition-transform ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : ''} ${
+						isOpen ? 'rotate-180' : ''
 					}`}
-					onClick={() => onOpenChange(!isOpen)}>
-					<div className='w-full flex items-center justify-between'>
-						<span className='flex gap-2 items-center'>
-							{isExerciseCompleted && <CircleCheckBig className='text-muted-foreground' />}
-							<h3 className='text-lg font-medium'>{exercise.name ?? 'Unnamed Exercise'}</h3>
-						</span>
-						<p
-							className={`text-xs ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : 'text-muted-foreground'}`}>
-							{completedSets} / {sets.length}
-						</p>
-					</div>
-					<ChevronDown
-						className={`h-4 w-4 transition-transform ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : ''} ${
-							isOpen ? 'rotate-180' : ''
-						}`}
-					/>
-				</Button>
-				<div
-					className={`grid transition-[grid-template-rows,opacity,margin] duration-200 ease-out ${
-						isOpen ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'
-					}`}>
-					<div className='overflow-hidden'>
-						<div className={`flex gap-4 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
-							<div className='w-px self-stretch bg-accent rounded ms-3 hidden md:block' />
-							<div className='w-full flex flex-col gap-6 items-start pt-2'>
-								{sets.map((set, index) => (
-									<div key={index} className='flex gap-4 items-start justify-between w-full'>
-										<Button
-											type='button'
-											className={`group rounded-full size-8 p-0 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-100 ${
-												set.completed
-													? 'bg-green-600 text-white hover:bg-green-500'
-													: 'border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
-											} ${
-												!isSetReady(set) && !set.completed
-													? 'cursor-not-allowed border-dashed bg-muted text-muted-foreground/45 hover:bg-muted hover:text-muted-foreground/45'
-													: ''
+				/>
+				<div className='w-full flex items-center justify-between'>
+					<span className='flex gap-2 items-center'>
+						{isExerciseCompleted && <CircleCheckBig className='text-green-700 dark:text-green-300' />}
+						<h3 className='font-medium text-lg'>{exercise.name ?? 'Unnamed Exercise'}</h3>
+					</span>
+					<p
+						className={`text-xs ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : 'text-muted-foreground'}`}>
+						{completedSets} / {sets.length}
+					</p>
+				</div>
+			</Button>
+			<div
+				className={`grid transition-[grid-template-rows,opacity,margin] duration-200 ease-out ${
+					isOpen ? 'grid-rows-[1fr] opacity-100 md:mt-4 mt-2' : 'grid-rows-[0fr] opacity-0'
+				}`}>
+				<div className='overflow-hidden'>
+					<div className={`flex gap-3 md:gap-4 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+						<div className='w-px self-stretch bg-accent rounded ms-3 hidden md:block' />
+						<div className='w-full flex flex-col gap-4 md:gap-6 items-start pt-2'>
+							{sets.map((set, index) => (
+								<div
+									key={index}
+									className='grid w-full grid-cols-[auto_1fr_auto] items-start gap-3 rounded-lg border border-border/50 p-3 md:flex md:items-start md:justify-between md:gap-4 md:border-0 md:p-0'>
+									<Button
+										type='button'
+										className={`row-start-1 col-start-1 group rounded-full size-8 p-1 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-100 ${
+											set.completed
+												? 'bg-green-600 text-white hover:bg-green-500'
+												: 'border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
+										} ${
+											!isSetReady(set) && !set.completed
+												? 'cursor-not-allowed border-dashed bg-muted text-muted-foreground/45 hover:bg-muted hover:text-muted-foreground/45'
+												: ''
+										}`}
+										aria-label={set.completed ? 'Unmark set as done' : 'Mark set as done'}
+										onClick={() => toggleSetCompleted(index, !set.completed)}
+										disabled={!isSetReady(set) && !set.completed}>
+										<Check
+											className={`transition-opacity ${
+												set.completed ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'
 											}`}
-											aria-label={set.completed ? 'Unmark set as done' : 'Mark set as done'}
-											onClick={() => toggleSetCompleted(index, !set.completed)}
-											disabled={!isSetReady(set) && !set.completed}>
-											<Check
-												className={`transition-opacity ${
-													set.completed ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'
-												}`}
-											/>
-										</Button>
-										<div className='flex flex-col gap-2 w-full'>
-											<div className='flex items-center gap-4 w-full'>
-												<InputGroup className='max-w-40'>
-													<InputGroupInput
-														type='number'
-														min={0}
-														disabled={set.completed}
-														value={set.reps || ''}
-														onChange={e => updateSet(index, 'reps', Number(e.target.value))}
-													/>
-													<InputGroupAddon align='inline-end'>reps</InputGroupAddon>
-												</InputGroup>
-												<InputGroup className='max-w-40'>
-													<InputGroupInput
-														type='number'
-														min={0}
-														disabled={set.completed}
-														value={set.weight || ''}
-														onChange={e => updateSet(index, 'weight', Number(e.target.value))}
-													/>
-													<InputGroupAddon align='inline-end'>kg</InputGroupAddon>
-												</InputGroup>
-											</div>
-											<div className='grid w-full gap-1'>
-												<Label className='text-muted-foreground text-xs'>Intensity</Label>
-												<ToggleGroup
-													type='single'
-													size='sm'
-													spacing={2}
+										/>
+									</Button>
+									<p className='row-start-1 col-start-2 text-xs text-muted-foreground self-center md:hidden'>
+										Set {index + 1}
+									</p>
+									<div className='row-start-2 col-span-3 w-full flex flex-col gap-2 md:row-auto md:col-auto md:flex-1'>
+										<div className='grid grid-cols-1 gap-2 w-full sm:grid-cols-2 md:flex md:items-center md:gap-4'>
+											<InputGroup className='w-full md:max-w-40'>
+												<InputGroupInput
+													type='number'
+													min={0}
 													disabled={set.completed}
-													value={set.intensity > 0 ? String(set.intensity) : ''}
-													onValueChange={value => updateSet(index, 'intensity', value ? Number(value) : 0)}>
-													{INTENSITY_LEVELS.map(level => (
-														<ToggleGroupItem key={level} value={String(level)}>
-															{level}
-														</ToggleGroupItem>
-													))}
-												</ToggleGroup>
-											</div>
+													value={set.reps || ''}
+													onChange={e => updateSet(index, 'reps', Number(e.target.value))}
+												/>
+												<InputGroupAddon align='inline-end'>reps</InputGroupAddon>
+											</InputGroup>
+											<InputGroup className='w-full md:max-w-40'>
+												<InputGroupInput
+													type='number'
+													min={0}
+													disabled={set.completed}
+													value={set.weight || ''}
+													onChange={e => updateSet(index, 'weight', Number(e.target.value))}
+												/>
+												<InputGroupAddon align='inline-end'>kg</InputGroupAddon>
+											</InputGroup>
 										</div>
+										<div className='grid w-full gap-1'>
+											<Label className='text-muted-foreground text-xs'>Intensity</Label>
+											<ToggleGroup
+												type='single'
+												size='sm'
+												variant='outline'
+												className='grid w-full grid-cols-5 gap-1 sm:flex sm:flex-wrap'
+												spacing={1}
+												disabled={set.completed}
+												value={set.intensity > 0 ? String(set.intensity) : ''}
+												onValueChange={value => updateSet(index, 'intensity', value ? Number(value) : 0)}>
+												{INTENSITY_LEVELS.map(level => (
+													<ToggleGroupItem key={level} value={String(level)} className='w-full px-0 sm:w-auto sm:px-2'>
+														{level}
+													</ToggleGroupItem>
+												))}
+											</ToggleGroup>
+										</div>
+									</div>
+									<div className='row-start-1 col-start-3 justify-self-end md:row-auto md:col-auto'>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<Button variant='ghost' size='icon' aria-label='Workout actions'>
+												<Button variant='ghost' size='icon-sm' aria-label='Workout actions'>
 													<EllipsisVertical />
 												</Button>
 											</DropdownMenuTrigger>
@@ -249,15 +245,15 @@ export default function WorkoutExerciseCard({
 											</DropdownMenuContent>
 										</DropdownMenu>
 									</div>
-								))}
-								<Button
-									size='sm'
-									variant='ghost'
-									className='opacity-60 hover:opacity-100 transition-all'
-									onClick={addSet}>
-									<Plus /> Add set
-								</Button>
-							</div>
+								</div>
+							))}
+							<Button
+								size='sm'
+								variant='ghost'
+								className='w-full md:w-auto justify-center opacity-70 hover:opacity-100 transition-all'
+								onClick={addSet}>
+								<Plus /> Add set
+							</Button>
 						</div>
 					</div>
 				</div>

@@ -61,8 +61,8 @@ export default function WorkoutSessionHeader({ workoutId, workoutLabel, exercise
 	}, [exerciseState, exercises])
 
 	return (
-		<div className='w-full'>
-			<div className='sticky top-0 flex items-center justify-between px-8 py-4'>
+		<div className='w-full sticky top-0 bg-background z-10'>
+			<div className='flex items-center justify-between px-4 py-4 xl:px-8'>
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
 						<Button variant='ghost' size='icon'>
@@ -84,7 +84,7 @@ export default function WorkoutSessionHeader({ workoutId, workoutLabel, exercise
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>
-				<h1 className='font-semibold text-xl'>
+				<h1 className='font-semibold md:text-xl'>
 					{workoutLabel}{' '}
 					<span className='text-muted-foreground ms-4'>
 						{progress.value}% ({progress.completedSets}/{progress.totalSets})
