@@ -6,16 +6,12 @@ export default async function WorkoutSessionPage({ params }: { params: Promise<{
 	const { id } = await params
 	const supabase = createClient()
 
-	const sessionId = Number(id)
+	const workoutId = Number(id)
 
-	const { data: session } = await (await supabase)
-		.from('workout_session')
-		.select('id, workout_id')
-		.eq('id', sessionId)
-		.single()
+	const { data: workout } = await (await supabase).from('workouts').select('id, name').eq('id', workoutId).single()
 
-	if (!session) {
-		throw new Error('Workout session not found')
+	if (!workout) {
+		throw new Error('Workout not found')
 	}
 
 	const { data: workoutExercises } = await (
@@ -30,7 +26,7 @@ export default async function WorkoutSessionPage({ params }: { params: Promise<{
 	)
   `,
 		)
-		.eq('workout_id', session.workout_id)
+		.eq('workout_id', workout.id)
 
 	const exercises =
 		workoutExercises?.map(item => ({
@@ -40,7 +36,7 @@ export default async function WorkoutSessionPage({ params }: { params: Promise<{
 
 	return (
 		<div>
-			<WorkoutSessionHeader sessionId={id} workoutLabel={`Workout ${id}`} exercises={exercises} />
+			<WorkoutSessionHeader workoutId={id} workoutLabel={workout.name} exercises={exercises} />
 			<div className='w-full space-y-6 p-4 max-w-7xl mx-auto'>
 				<WorkoutExercisesList exercises={exercises} />
 			</div>

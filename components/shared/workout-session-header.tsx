@@ -15,18 +15,18 @@ import {
 	AlertDialogAction,
 	AlertDialogCancel,
 	AlertDialogFooter,
-    AlertDialogTitle,
+	AlertDialogTitle,
 } from '../ui/alert-dialog'
 
 type WorkoutSessionHeaderProps = {
-	sessionId: string
+	workoutId: string
 	workoutLabel: string
 	exercises: WorkoutExercise[]
 }
 
 const DEFAULT_SETS_PER_EXERCISE = 3
 
-export default function WorkoutSessionHeader({ sessionId, workoutLabel, exercises }: WorkoutSessionHeaderProps) {
+export default function WorkoutSessionHeader({ workoutId, workoutLabel, exercises }: WorkoutSessionHeaderProps) {
 	const router = useRouter()
 	const exerciseState = useWorkoutSessionStore(s => s.exercises)
 
@@ -60,7 +60,7 @@ export default function WorkoutSessionHeader({ sessionId, workoutLabel, exercise
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
-                        <AlertDialogTitle>Leave workout session</AlertDialogTitle>
+						<AlertDialogTitle>Leave workout session</AlertDialogTitle>
 						<p>Are you sure you want to leave the workout session?</p>
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -74,7 +74,7 @@ export default function WorkoutSessionHeader({ sessionId, workoutLabel, exercise
 						{progress.value}% ({progress.completedSets}/{progress.totalSets})
 					</span>
 				</h1>
-				<FinishWorkoutButton sessionId={sessionId} canSave={progress.value === 100} />
+				<FinishWorkoutButton workoutId={workoutId} canSave={progress.value === 100} />
 			</div>
 			<Progress value={progress.value} className='h-1 rounded-none' />
 		</div>

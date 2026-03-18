@@ -7,11 +7,11 @@ import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { Save } from 'lucide-react'
 
 type FinishWorkoutButtonProps = {
-	sessionId: string
+	workoutId: string
 	canSave?: boolean
 }
 
-export default function FinishWorkoutButton({ sessionId, canSave = true }: FinishWorkoutButtonProps) {
+export default function FinishWorkoutButton({ workoutId, canSave = true }: FinishWorkoutButtonProps) {
 	const supabase = createClient()
 	const [loading, setLoading] = useState(false)
 	const [finished, setFinished] = useState(false)
@@ -22,11 +22,21 @@ export default function FinishWorkoutButton({ sessionId, canSave = true }: Finis
 		try {
 			setLoading(true)
 
+			const { data: createdSession, error: sessionError } = await supabase
+				.from('workout_session')
+				.insert({
+					workout_id: Number(workoutId),
+				})
+				.select('id')
+				.single()
+
+			if (sessionError || !createdSession) throw sessionError ?? new Error('Failed to create workout session')
+
 			const exercises = Object.values(useWorkoutSessionStore.getState().exercises)
 
 			if (exercises.length > 0) {
 				const exerciseRows = exercises.map(exercise => ({
-					session_id: Number(sessionId),
+					session_id: createdSession.id,
 					exercise_id: exercise.exerciseId,
 					notes: exercise.notes ?? null,
 				}))
