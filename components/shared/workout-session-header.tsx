@@ -1,0 +1,61 @@
+'use client'
+
+import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+import { Progress } from '@/components/ui/progress'
+import type { WorkoutExercise } from '@/types/view'
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { Button } from '../ui/button'
+import FinishWorkoutButton from './finish-workout-button'
+
+type WorkoutSessionHeaderProps = {
+	sessionId: string
+	workoutLabel: string
+	exercises: WorkoutExercise[]
+}
+
+const DEFAULT_SETS_PER_EXERCISE = 3
+
+export default function WorkoutSessionHeader({ sessionId, workoutLabel, exercises }: WorkoutSessionHeaderProps) {
+	const router = useRouter()
+	const exerciseState = useWorkoutSessionStore(s => s.exercises)
+
+	const progress = useMemo(() => {
+		const totalSets = exercises.reduce((sum, exercise) => {
+			const sets = exerciseState[exercise.id]?.sets
+			return sum + (sets?.length ?? DEFAULT_SETS_PER_EXERCISE)
+		}, 0)
+
+		const completedSets = exercises.reduce((sum, exercise) => {
+			const sets = exerciseState[exercise.id]?.sets ?? []
+			return sum + sets.filter(set => set.completed).length
+		}, 0)
+
+		const value = totalSets === 0 ? 0 : Math.round((completedSets / totalSets) * 100)
+
+		return {
+			completedSets,
+			totalSets,
+			value,
+		}
+	}, [exerciseState, exercises])
+
+	return (
+		<div className='w-full'>
+			<div className='sticky top-0 flex items-center justify-between px-8 py-4'>
+				<Button variant='ghost' size='icon' onClick={() => router.push('/dashboard/workouts')}>
+					<ArrowLeft />
+				</Button>
+				<h1 className='font-semibold text-xl'>
+					{workoutLabel}{' '}
+					<span className='text-muted-foreground ms-4'>
+						{progress.value}% ({progress.completedSets}/{progress.totalSets})
+					</span>
+				</h1>
+				<FinishWorkoutButton sessionId={sessionId} canSave={progress.value === 100} />
+			</div>
+			<Progress value={progress.value} className='h-1 rounded-none' />
+		</div>
+	)
+}

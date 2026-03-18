@@ -1,9 +1,6 @@
-import FinishWorkoutButton from '@/components/shared/finish-workout-button'
 import WorkoutExercisesList from '@/components/shared/workout-exercises-list'
-import { Button } from '@/components/ui/button'
+import WorkoutSessionHeader from '@/components/shared/workout-session-header'
 import { createClient } from '@/lib/supabase/server'
-import { ArrowLeft } from 'lucide-react'
-import { Progress } from '@/components/ui/progress'
 
 export default async function WorkoutSessionPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -43,13 +40,7 @@ export default async function WorkoutSessionPage({ params }: { params: Promise<{
 
 	return (
 		<div>
-			<div className='sticky top-0 flex items-center justify-between px-8 py-4'>
-                <Button>
-                    <ArrowLeft />
-                </Button>
-				<h1 className='font-semibold text-xl'>Workout {id}</h1>
-				<FinishWorkoutButton sessionId={id} />
-			</div>
+			<WorkoutSessionHeader sessionId={id} workoutLabel={`Workout ${id}`} exercises={exercises} />
 			<div className='w-full space-y-6 p-4 max-w-7xl mx-auto'>
 				<WorkoutExercisesList exercises={exercises} />
 			</div>

@@ -6,12 +6,19 @@ import { createClient } from '@/lib/supabase/client'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { Save } from 'lucide-react'
 
-export default function FinishWorkoutButton({ sessionId }: { sessionId: string }) {
+type FinishWorkoutButtonProps = {
+	sessionId: string
+	canSave?: boolean
+}
+
+export default function FinishWorkoutButton({ sessionId, canSave = true }: FinishWorkoutButtonProps) {
 	const supabase = createClient()
 	const [loading, setLoading] = useState(false)
 	const [finished, setFinished] = useState(false)
 
 	async function finishWorkout() {
+		if (!canSave || loading || finished) return
+
 		try {
 			setLoading(true)
 
@@ -63,9 +70,9 @@ export default function FinishWorkoutButton({ sessionId }: { sessionId: string }
 	}
 
 	return (
-		<Button onClick={finishWorkout} disabled={loading || finished}>
+		<Button onClick={finishWorkout} disabled={loading || finished || !canSave}>
 			<Save className='ml-1 h-4 w-4' />
-			{finished ? 'Workout Saved' : loading ? 'Saving…' : 'Save workout'}
+			{finished ? 'Workout Saved' : loading ? 'Saving…' : canSave ? 'Save workout' : 'Complete all sets'}
 		</Button>
 	)
 }
