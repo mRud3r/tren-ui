@@ -41,6 +41,7 @@ export type Database = {
 					intensivity: number | null
 					notes: string | null
 					session_id: number
+					user_id: string | null
 				}
 				Insert: {
 					created_at?: string
@@ -49,6 +50,7 @@ export type Database = {
 					intensivity?: number | null
 					notes?: string | null
 					session_id: number
+					user_id?: string | null
 				}
 				Update: {
 					created_at?: string
@@ -57,6 +59,7 @@ export type Database = {
 					intensivity?: number | null
 					notes?: string | null
 					session_id?: number
+					user_id?: string | null
 				}
 				Relationships: [
 					{
@@ -82,6 +85,7 @@ export type Database = {
 					inensity: number | null
 					reps: number | null
 					session_id: number
+					user_id: string | null
 					weight: number | null
 				}
 				Insert: {
@@ -90,6 +94,7 @@ export type Database = {
 					inensity?: number | null
 					reps?: number | null
 					session_id: number
+					user_id?: string | null
 					weight?: number | null
 				}
 				Update: {
@@ -98,6 +103,7 @@ export type Database = {
 					inensity?: number | null
 					reps?: number | null
 					session_id?: number
+					user_id?: string | null
 					weight?: number | null
 				}
 				Relationships: [
@@ -194,16 +200,19 @@ export type Database = {
 				Row: {
 					created_at: string | null
 					id: number
+					user_id: string | null
 					workout_id: number
 				}
 				Insert: {
 					created_at?: string | null
 					id?: number
+					user_id?: string | null
 					workout_id: number
 				}
 				Update: {
 					created_at?: string | null
 					id?: number
+					user_id?: string | null
 					workout_id?: number
 				}
 				Relationships: [
@@ -222,18 +231,21 @@ export type Database = {
 					description: string | null
 					id: number
 					name: string
+					user_id: string | null
 				}
 				Insert: {
 					created_at?: string | null
 					description?: string | null
 					id?: number
 					name: string
+					user_id?: string | null
 				}
 				Update: {
 					created_at?: string | null
 					description?: string | null
 					id?: number
 					name?: string
+					user_id?: string | null
 				}
 				Relationships: []
 			}

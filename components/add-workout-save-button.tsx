@@ -38,10 +38,20 @@ export function AddWorkoutSaveButton() {
 		setErrorMessage(null)
 
 		try {
+			const {
+				data: { user },
+				error: userError,
+			} = await supabase.auth.getUser()
+
+			if (userError || !user) {
+				throw userError ?? new Error('User not authenticated.')
+			}
+
 			const { data: workout, error: workoutError } = await supabase
 				.from('workouts')
 				.insert({
 					name: name.trim(),
+					user_id: user.id,
 				})
 				.select('id')
 				.single()
@@ -58,7 +68,7 @@ export function AddWorkoutSaveButton() {
 			const { error: exercisesError } = await supabase.from('workout_exercises').insert(rows)
 
 			if (exercisesError) {
-				await supabase.from('workouts').delete().eq('id', workout.id)
+				await supabase.from('workouts').delete().eq('id', workout.id).eq('user_id', user.id)
 				throw exercisesError
 			}
 

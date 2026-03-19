@@ -4,8 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 export default async function DashboardPage() {
 	const supabase = await createClient()
 
-	const { data, error } = await supabase.auth.getClaims()
-	if (error || !data?.claims) {
+	const {
+		data: { user },
+		error,
+	} = await supabase.auth.getUser()
+	if (error || !user) {
 		redirect('/auth/login')
 	}
 
@@ -23,6 +26,7 @@ export default async function DashboardPage() {
     )
   `,
 		)
+		.eq('user_id', user.id)
 		.order('created_at', { ascending: false })
 		.limit(1)
 		.single()

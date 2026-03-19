@@ -24,10 +24,35 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 		setErrorMessage(null)
 
 		try {
+			const {
+				data: { user },
+				error: userError,
+			} = await supabase.auth.getUser()
+
+			if (userError || !user) {
+				throw userError ?? new Error('User not authenticated.')
+			}
+
+			const { data: workout, error: workoutFetchError } = await supabase
+				.from('workouts')
+				.select('id')
+				.eq('id', workoutId)
+				.eq('user_id', user.id)
+				.maybeSingle()
+
+			if (workoutFetchError) {
+				throw workoutFetchError
+			}
+
+			if (!workout) {
+				throw new Error('Workout not found for current user.')
+			}
+
 			const { data: sessions, error: sessionsFetchError } = await supabase
 				.from('workout_session')
 				.select('id')
 				.eq('workout_id', workoutId)
+				.eq('user_id', user.id)
 
 			if (sessionsFetchError) {
 				throw sessionsFetchError
@@ -40,6 +65,7 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 					.from('exercise_session')
 					.select('id')
 					.in('session_id', sessionIds)
+					.eq('user_id', user.id)
 
 				if (exerciseSessionsFetchError) {
 					throw exerciseSessionsFetchError
@@ -52,6 +78,7 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 						.from('exercise_set')
 						.delete()
 						.in('session_id', exerciseSessionIds)
+						.eq('user_id', user.id)
 
 					if (exerciseSetDeleteError) {
 						throw exerciseSetDeleteError
@@ -62,13 +89,18 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 					.from('exercise_session')
 					.delete()
 					.in('session_id', sessionIds)
+					.eq('user_id', user.id)
 
 				if (exerciseSessionDeleteError) {
 					throw exerciseSessionDeleteError
 				}
 			}
 
-			const { error: sessionsDeleteError } = await supabase.from('workout_session').delete().eq('workout_id', workoutId)
+			const { error: sessionsDeleteError } = await supabase
+				.from('workout_session')
+				.delete()
+				.eq('workout_id', workoutId)
+				.eq('user_id', user.id)
 
 			if (sessionsDeleteError) {
 				throw sessionsDeleteError
@@ -83,7 +115,11 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 				throw workoutExercisesDeleteError
 			}
 
-			const { error: workoutDeleteError } = await supabase.from('workouts').delete().eq('id', workoutId)
+			const { error: workoutDeleteError } = await supabase
+				.from('workouts')
+				.delete()
+				.eq('id', workoutId)
+				.eq('user_id', user.id)
 
 			if (workoutDeleteError) {
 				throw workoutDeleteError

@@ -5,10 +5,19 @@ import type { Tables } from '@/types/supabase'
 
 export const WorkoutsList = async () => {
 	const supabase = await createClient()
+	const {
+		data: { user },
+		error: userError,
+	} = await supabase.auth.getUser()
+
+	if (userError || !user) {
+		return <div className='text-sm text-destructive'>Error: User not authenticated.</div>
+	}
 
 	const { data: workoutsData, error } = await supabase
 		.from('workouts')
 		.select('id, name, description, workout_exercises(id)')
+		.eq('user_id', user.id)
 		.order('id', { ascending: true })
 
 	if (error) {

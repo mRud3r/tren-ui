@@ -1,22 +1,37 @@
 import WorkoutExercisesList from '@/components/shared/workout-exercises-list'
 import WorkoutSessionHeader from '@/components/shared/workout-session-header'
 import { createClient } from '@/lib/supabase/server'
+import { notFound } from 'next/navigation'
 
 export default async function WorkoutSessionPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
-	const supabase = createClient()
+	const supabase = await createClient()
+	const {
+		data: { user },
+		error: userError,
+	} = await supabase.auth.getUser()
 
-	const workoutId = Number(id)
-
-	const { data: workout } = await (await supabase).from('workouts').select('id, name').eq('id', workoutId).single()
-
-	if (!workout) {
-		throw new Error('Workout not found')
+	if (userError || !user) {
+		notFound()
 	}
 
-	const { data: workoutExercises } = await (
-		await supabase
-	)
+	const workoutId = Number(id)
+	if (Number.isNaN(workoutId)) {
+		notFound()
+	}
+
+	const { data: workout } = await supabase
+		.from('workouts')
+		.select('id, name')
+		.eq('id', workoutId)
+		.eq('user_id', user.id)
+		.single()
+
+	if (!workout) {
+		notFound()
+	}
+
+	const { data: workoutExercises } = await supabase
 		.from('workout_exercises')
 		.select(
 			`

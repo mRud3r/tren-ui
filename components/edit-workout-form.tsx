@@ -35,6 +35,15 @@ export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
 		setErrorMessage(null)
 
 		try {
+			const {
+				data: { user },
+				error: userError,
+			} = await supabase.auth.getUser()
+
+			if (userError || !user) {
+				throw userError ?? new Error('User not authenticated.')
+			}
+
 			const { error } = await supabase
 				.from('workouts')
 				.update({
@@ -42,6 +51,7 @@ export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
 					description: description.trim().length > 0 ? description.trim() : null,
 				})
 				.eq('id', workout.id)
+				.eq('user_id', user.id)
 
 			if (error) {
 				throw error

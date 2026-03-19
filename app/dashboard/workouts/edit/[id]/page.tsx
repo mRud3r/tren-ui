@@ -11,11 +11,20 @@ export default async function EditWorkoutPage({ params }: { params: Promise<{ id
 	}
 
 	const supabase = await createClient()
+	const {
+		data: { user },
+		error: userError,
+	} = await supabase.auth.getUser()
+
+	if (userError || !user) {
+		notFound()
+	}
 
 	const { data: workout, error } = await supabase
 		.from('workouts')
 		.select('id, name, description')
 		.eq('id', workoutId)
+		.eq('user_id', user.id)
 		.single()
 
 	if (error || !workout) {

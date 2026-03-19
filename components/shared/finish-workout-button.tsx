@@ -22,10 +22,18 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 		try {
 			setLoading(true)
 
+			const {
+				data: { user },
+				error: userError,
+			} = await supabase.auth.getUser()
+
+			if (userError || !user) throw userError ?? new Error('User not authenticated')
+
 			const { data: createdSession, error: sessionError } = await supabase
 				.from('workout_session')
 				.insert({
 					workout_id: Number(workoutId),
+					user_id: user.id,
 				})
 				.select('id')
 				.single()
@@ -39,6 +47,7 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 					session_id: createdSession.id,
 					exercise_id: exercise.exerciseId,
 					notes: exercise.notes ?? null,
+					user_id: user.id,
 				}))
 
 				const { data: insertedExerciseSessions, error: exerciseSessionError } = await supabase
@@ -60,6 +69,7 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 						reps: set.reps,
 						weight: set.weight ?? null,
 						inensity: set.intensity ?? null,
+						user_id: user.id,
 					}))
 				})
 
