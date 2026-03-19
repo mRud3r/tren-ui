@@ -14,7 +14,7 @@ export function AddWorkoutExercisesGrid({ exercises }: Props) {
 	const removeExercise = useCreateWorkoutStore(state => state.removeExercise)
 
 	return (
-		<div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+		<div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2'>
 			{exercises.map(exercise => {
 				const isSelected = Boolean(selectedExercises[exercise.id])
 

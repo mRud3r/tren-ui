@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { SquarePen } from 'lucide-react'
 
 import { AddWorkoutExercisesGrid } from '@/components/add-workout-exercises-grid'
 import { ExerciseSearch } from '@/components/exercise-search'
@@ -28,8 +28,8 @@ export function AddWorkoutExerciseDrawer({ muscles, musclesError, exercises, exe
 		<Drawer direction='bottom'>
 			<DrawerTrigger asChild>
 				<Button type='button' variant='default'>
-					<Plus className='h-4 w-4' />
-					Add exercises
+					<SquarePen className='h-4 w-4' />
+					Exercises
 				</Button>
 			</DrawerTrigger>
 			<DrawerContent className='h-[80vh]'>

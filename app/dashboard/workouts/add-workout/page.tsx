@@ -72,9 +72,16 @@ export default async function NewWorkoutPage({
 	})
 
 	return (
-		<div className='w-full space-y-6 p-4'>
+		<div className='w-full space-y-6 p-4 h-full'>
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-medium'>New Workout</h1>
+				<AddWorkoutSaveButton />
+			</div>
+			<div className='flex flex-col gap-2'>
+				<AddWorkoutNameInput />
+				<AddWorkoutSelectedExercises />
+			</div>
+			<div className='flex justify-end'>
 				<AddWorkoutExerciseDrawer
 					muscles={musclesData ?? []}
 					musclesError={musclesError}
@@ -82,11 +89,6 @@ export default async function NewWorkoutPage({
 					exercisesErrorMessage={exercisesError?.message}
 				/>
 			</div>
-			<div className='flex flex-col gap-2'>
-				<AddWorkoutNameInput />
-				<AddWorkoutSelectedExercises />
-			</div>
-			<AddWorkoutSaveButton />
 		</div>
 	)
 }

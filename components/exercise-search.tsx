@@ -11,6 +11,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
 import { exerciseTypeConfig, exerciseTypes, isExerciseType } from '@/lib/exerciseTypeIcons'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -37,7 +38,7 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 	}
 
 	return (
-		<div className='flex flex-col gap-2'>
+		<div className='flex flex-col gap-2 mt-2'>
 			<div className='flex gap-2'>
 				<InputGroup>
 					<InputGroupInput
@@ -75,34 +76,38 @@ export function ExerciseSearch({ muscles, musclesError }: Props) {
 					</SelectContent>
 				</Select>
 			</div>
-			<ToggleGroup
-				type='single'
-				value={activeType ?? '__all__'}
-				spacing={2}
-				variant='outline'
-				onValueChange={value => {
-					if (!value || value === '__all__') {
-						setParam('type', undefined)
-					} else {
-						setParam('type', value)
-					}
-				}}>
-				<ToggleGroupItem value='__all__' aria-label='All categories'>
-					<LayoutGrid className='h-2 w-2' />
-					All Categories
-				</ToggleGroupItem>
+			<ScrollArea className='w-full touch-pan-x' orientation='horizontal' scrollbarClassName='h-1.5'>
+				<ToggleGroup
+					className='min-w-max mb-2'
+					size={'sm'}
+					type='single'
+					value={activeType ?? '__all__'}
+					spacing={2}
+					variant='outline'
+					onValueChange={value => {
+						if (!value || value === '__all__') {
+							setParam('type', undefined)
+						} else {
+							setParam('type', value)
+						}
+					}}>
+					<ToggleGroupItem value='__all__' aria-label='All categories'>
+						<LayoutGrid className='h-2 w-2' />
+						All Categories
+					</ToggleGroupItem>
 
-				{exerciseTypes.map(type => {
-					const Icon = exerciseTypeConfig[type].icon
+					{exerciseTypes.map(type => {
+						const Icon = exerciseTypeConfig[type].icon
 
-					return (
-						<ToggleGroupItem key={type} value={type} aria-label={exerciseTypeConfig[type].label}>
-							<Icon className='h-2 w-2' />
-							{exerciseTypeConfig[type].label}
-						</ToggleGroupItem>
-					)
-				})}
-			</ToggleGroup>
+						return (
+							<ToggleGroupItem key={type} value={type} aria-label={exerciseTypeConfig[type].label}>
+								<Icon className='h-2 w-2' />
+								{exerciseTypeConfig[type].label}
+							</ToggleGroupItem>
+						)
+					})}
+				</ToggleGroup>
+			</ScrollArea>
 		</div>
 	)
 }

@@ -77,13 +77,13 @@ export default async function ExcersisesPage({
 	})
 
 	return (
-		<div className='w-full space-y-6 p-4'>
+		<div className='flex flex-col gap-2 p-4'>
 			<h1 className='text-2xl font-medium'>Exercise Library</h1>
 			<ExerciseSearch muscles={muscleData ?? []} musclesError={musclesError} />
 			{exercises.length === 0 ? (
 				<div className='text-sm opacity-70'>No exercises available</div>
 			) : (
-				<div className='grid sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+				<div className='grid sm:grid-cols-2 xl:grid-cols-3 gap-2'>
 					{exercises.map(ex => (
 						<Link key={ex.id} href={`/dashboard/exercises/${ex.id}`} className='block'>
 							<ExerciseCard exercise={ex} />
