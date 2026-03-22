@@ -38,7 +38,6 @@ export type Database = {
 					created_at: string
 					exercise_id: number
 					id: number
-					intensivity: number | null
 					notes: string | null
 					session_id: number
 					user_id: string | null
@@ -47,7 +46,6 @@ export type Database = {
 					created_at?: string
 					exercise_id: number
 					id?: number
-					intensivity?: number | null
 					notes?: string | null
 					session_id: number
 					user_id?: string | null
@@ -56,7 +54,6 @@ export type Database = {
 					created_at?: string
 					exercise_id?: number
 					id?: number
-					intensivity?: number | null
 					notes?: string | null
 					session_id?: number
 					user_id?: string | null
@@ -82,7 +79,7 @@ export type Database = {
 				Row: {
 					created_at: string
 					id: number
-					inensity: number | null
+					intensity: number | null
 					reps: number | null
 					session_id: number
 					user_id: string | null
@@ -91,7 +88,7 @@ export type Database = {
 				Insert: {
 					created_at?: string
 					id?: number
-					inensity?: number | null
+					intensity?: number | null
 					reps?: number | null
 					session_id: number
 					user_id?: string | null
@@ -100,7 +97,7 @@ export type Database = {
 				Update: {
 					created_at?: string
 					id?: number
-					inensity?: number | null
+					intensity?: number | null
 					reps?: number | null
 					session_id?: number
 					user_id?: string | null
@@ -259,7 +256,6 @@ export type Database = {
 		Enums: {
 			difficulty_level: 'easy' | 'intermediate' | 'hard'
 			exercise_type: 'strength' | 'cardio' | 'flexibility' | 'core' | 'plyometric'
-			session_status: 'completed' | 'started' | 'cancelled'
 		}
 		CompositeTypes: {
 			[_ in never]: never
@@ -384,7 +380,6 @@ export const Constants = {
 		Enums: {
 			difficulty_level: ['easy', 'intermediate', 'hard'],
 			exercise_type: ['strength', 'cardio', 'flexibility', 'core', 'plyometric'],
-			session_status: ['completed', 'started', 'cancelled'],
 		},
 	},
 } as const
