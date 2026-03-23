@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Trash, Plus, ChevronDown, EllipsisVertical, Check, CircleCheckBig } from 'lucide-react'
+import { X, Trash, Plus, ChevronDown, EllipsisVertical, Check, CircleCheckBig } from 'lucide-react'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { WorkoutExercise } from '@/types/view'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -74,16 +74,29 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 		})
 	}
 
+	const setsRef = useRef(sets)
+	setsRef.current = sets
+
+	const completionTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
+
 	const updateSet = (index: number, field: keyof SetData, value: number) => {
 		const newSets = [...sets]
 		newSets[index] = {
 			...newSets[index],
 			[field]: value,
+			completed: false,
 		}
-		newSets[index].completed = isSetReady(newSets[index])
 
 		setSets(newSets)
 		syncExercise(newSets)
+
+		clearTimeout(completionTimers.current[index])
+		completionTimers.current[index] = setTimeout(() => {
+			const updated = [...setsRef.current]
+			updated[index] = { ...updated[index], completed: isSetReady(updated[index]) }
+			setSets(updated)
+			syncExercise(updated)
+		}, 600)
 	}
 
 	const toggleSetCompleted = (index: number, checked: boolean) => {
@@ -237,22 +250,15 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 										</div>
 									</div>
 									<div className='row-start-1 col-start-3 justify-self-end md:row-auto md:col-auto'>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button variant='ghost' size='icon-sm' aria-label='Workout actions'>
-													<EllipsisVertical />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align='end' className='w-36'>
-												<DropdownMenuItem
-													disabled={sets.length === 1}
-													onSelect={() => removeSet(index)}
-													className='text-destructive focus:text-destructive disabled:opacity-30'>
-													<Trash className='h-4 w-4' />
-													<span>Delete</span>
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
+										<Button
+											variant='ghost'
+											size='icon-sm'
+											aria-label='Remove set'
+											disabled={sets.length === 1}
+											onClick={() => removeSet(index)}
+											className='text-muted-foreground hover:text-destructive disabled:opacity-30'>
+											<X className='h-4 w-4' />
+										</Button>
 									</div>
 								</div>
 							))}
