@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { useRouter } from 'next/navigation'
 import { Play } from 'lucide-react'
 
@@ -22,7 +23,7 @@ export function StartWorkoutButton({ workoutId }: { workoutId: number }) {
 
 	return (
 		<Button className='w-full flex gap-1 items-center justify-center' onClick={startWorkout} disabled={loading}>
-			<Play />
+			{loading ? <Spinner /> : <Play />}
 			{loading ? 'Starting…' : 'Start workout'}
 		</Button>
 	)

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EllipsisVertical, SquarePen, Trash } from 'lucide-react'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -125,10 +126,13 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 				throw workoutDeleteError
 			}
 
+			toast.success('Workout deleted')
 			router.refresh()
 		} catch (error) {
 			console.error('Failed to delete workout:', error)
-			setErrorMessage(error instanceof Error ? error.message : 'Failed to delete workout.')
+			const message = error instanceof Error ? error.message : 'Failed to delete workout.'
+			setErrorMessage(message)
+			toast.error(message)
 		} finally {
 			setDeleting(false)
 		}

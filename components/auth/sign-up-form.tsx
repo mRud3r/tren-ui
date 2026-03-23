@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export function SignUpForm({
   className,
@@ -103,7 +104,7 @@ export function SignUpForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+                {isLoading ? <><Spinner className="mr-1" /> Creating an account...</> : "Sign up"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
