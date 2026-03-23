@@ -13,7 +13,7 @@ export default function WorkoutExercisesList({ exercises }: WorkoutExercisesList
 	const activeExercises = useWorkoutSessionStore(s => s.activeExercises)
 	const initSessionExercises = useWorkoutSessionStore(s => s.initSessionExercises)
 
-	const [openExerciseId, setOpenExerciseId] = useState<number | null>(exercises[0]?.id ?? null)
+	const [openExerciseId, setOpenExerciseId] = useState<number | null>(null)
 
 	useEffect(() => {
 		initSessionExercises(exercises)

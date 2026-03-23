@@ -61,6 +61,10 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 	const completedSets = sets.filter(set => set.completed).length
 	const isExerciseCompleted = sets.length > 0 && completedSets === sets.length
 
+	useEffect(() => {
+		if (isExerciseCompleted) onOpenChange(false)
+	}, [isExerciseCompleted])
+
 	const isSetReady = (set: SetData) => set.reps > 0 && set.weight > 0 && set.intensity > 0
 
 	const syncExercise = (nextSets: SetData[]) => {
