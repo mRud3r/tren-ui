@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import ActiveWorkoutDialog from '@/components/workout-session/active-workout-dialog'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
@@ -34,6 +35,7 @@ export default function RootLayout({
 					{children}
 					<ActiveWorkoutDialog />
 				</ThemeProvider>
+				<Toaster richColors position='top-right' />
 			</body>
 		</html>
 	)
