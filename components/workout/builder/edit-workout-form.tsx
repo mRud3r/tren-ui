@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save } from 'lucide-react'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -57,11 +59,14 @@ export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
 				throw error
 			}
 
+			toast.success('Changes saved!')
 			router.push('/dashboard/workouts')
 			router.refresh()
 		} catch (error) {
 			console.error('Failed to update workout:', error)
-			setErrorMessage(error instanceof Error ? error.message : 'Failed to update workout.')
+			const message = error instanceof Error ? error.message : 'Failed to update workout.'
+			setErrorMessage(message)
+			toast.error(message)
 		} finally {
 			setLoading(false)
 		}
@@ -84,7 +89,7 @@ export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
 			</div>
 			<div className='flex flex-col items-start gap-1'>
 				<Button type='button' onClick={handleSaveWorkout} disabled={!canSave}>
-					<Save className='h-4 w-4' />
+					{loading ? <Spinner className='mr-1' /> : <Save className='h-4 w-4' />}
 					{loading ? 'Saving...' : 'Save changes'}
 				</Button>
 				{errorMessage ? <p className='text-xs text-destructive'>{errorMessage}</p> : null}

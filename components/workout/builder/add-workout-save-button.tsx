@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { createClient } from '@/lib/supabase/client'
 import { useCreateWorkoutStore } from '@/stores/createWorkout.store'
 import type { ExerciseCardData } from '@/types/view'
@@ -73,11 +75,14 @@ export function AddWorkoutSaveButton() {
 			}
 
 			clear()
+			toast.success('Workout saved!')
 			router.push('/dashboard/workouts')
 			router.refresh()
 		} catch (error) {
 			console.error('Failed to save workout:', error)
-			setErrorMessage(error instanceof Error ? error.message : 'Failed to save workout.')
+			const message = error instanceof Error ? error.message : 'Failed to save workout.'
+			setErrorMessage(message)
+			toast.error(message)
 		} finally {
 			setLoading(false)
 		}
@@ -86,7 +91,7 @@ export function AddWorkoutSaveButton() {
 	return (
 		<div className='flex flex-col items-start gap-1'>
 			<Button type='button' variant='secondary' onClick={saveWorkout} disabled={!canSave}>
-				<Save className='h-4 w-4' />
+				{loading ? <Spinner className='mr-1' /> : <Save className='h-4 w-4' />}
 				{loading ? 'Saving...' : 'Save workout'}
 			</Button>
 			{errorMessage && <p className='text-xs text-destructive'>{errorMessage}</p>}

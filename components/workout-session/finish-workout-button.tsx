@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { createClient } from '@/lib/supabase/client'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { Save } from 'lucide-react'
@@ -84,9 +86,11 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 
 			useWorkoutSessionStore.getState().clear()
 			setFinished(true)
+			toast.success('Workout saved!')
 			router.replace('/dashboard')
 		} catch (err) {
 			console.error('Failed to finish workout:', err)
+			toast.error(err instanceof Error ? err.message : 'Failed to save workout.')
 		} finally {
 			setLoading(false)
 		}
@@ -94,7 +98,7 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 
 	return (
 		<Button onClick={finishWorkout} disabled={loading || finished || !canSave}>
-			<Save className='ml-1 h-4 w-4' />
+			{loading ? <Spinner className='ml-1' /> : <Save className='ml-1 h-4 w-4' />}
 			Save workout
 		</Button>
 	)
