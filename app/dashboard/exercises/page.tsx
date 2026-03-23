@@ -1,11 +1,12 @@
-import Link from 'next/link'
-import { ExerciseCard } from '@/components/exercise/exercise-card'
 import { ExerciseSearch } from '@/components/exercise/exercise-search'
+import { ExercisesInfiniteList } from '@/components/exercise/exercises-infinite-list'
 import { isExerciseType } from '@/lib/exerciseTypeIcons'
 import { createClient } from '@/lib/supabase/server'
 import type { ExerciseCardData } from '@/types/view'
 
-export default async function ExcersisesPage({
+const PAGE_SIZE = 20
+
+export default async function ExercisesPage({
 	searchParams,
 }: {
 	searchParams: Promise<{
@@ -32,21 +33,13 @@ export default async function ExcersisesPage({
     `,
 	)
 
-	if (search) {
-		exercisesQuery = exercisesQuery.ilike('exercise_name', `%${search}%`)
-	}
+	if (search) exercisesQuery = exercisesQuery.ilike('exercise_name', `%${search}%`)
+	if (muscle) exercisesQuery = exercisesQuery.eq('primary_muscle_id', Number(muscle))
+	if (type && isExerciseType(type)) exercisesQuery = exercisesQuery.eq('type', type)
 
-	if (muscle) {
-		exercisesQuery = exercisesQuery.eq('primary_muscle_id', Number(muscle))
-	}
-
-	if (type && isExerciseType(type)) {
-		exercisesQuery = exercisesQuery.eq('type', type)
-	}
-
-	const { data: exercisesData, error: exercisesError } = await exercisesQuery.order('id', {
-		ascending: true,
-	})
+	const { data: exercisesData, error: exercisesError } = await exercisesQuery
+		.order('id', { ascending: true })
+		.range(0, PAGE_SIZE - 1)
 
 	const musclesError = Boolean(musclesFetchError)
 
@@ -80,17 +73,14 @@ export default async function ExcersisesPage({
 		<div className='flex flex-col gap-2 p-4'>
 			<h1 className='text-2xl font-medium'>Exercise Library</h1>
 			<ExerciseSearch muscles={muscleData ?? []} musclesError={musclesError} />
-			{exercises.length === 0 ? (
-				<div className='text-sm opacity-70'>No exercises available</div>
-			) : (
-				<div className='grid sm:grid-cols-2 xl:grid-cols-3 gap-2'>
-					{exercises.map(ex => (
-						<Link key={ex.id} href={`/dashboard/exercises/${ex.id}`} className='block'>
-							<ExerciseCard exercise={ex} />
-						</Link>
-					))}
-				</div>
-			)}
+			<ExercisesInfiniteList
+				key={`${search ?? ''}-${muscle ?? ''}-${type ?? ''}`}
+				initialExercises={exercises}
+				initialHasMore={exercises.length === PAGE_SIZE}
+				search={search}
+				muscle={muscle}
+				type={type}
+			/>
 		</div>
 	)
 }
