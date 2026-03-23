@@ -126,12 +126,13 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 						}`}
 					/>
 					<span className='flex gap-2 items-center min-w-0'>
-						{isExerciseCompleted && <CircleCheckBig className='shrink-0 text-green-700 dark:text-green-300' />}
+						{isExerciseCompleted && <CircleCheckBig className='h-4 w-4 shrink-0 text-green-700 dark:text-green-300' />}
 						<h3 className='font-medium text-lg truncate'>{exercise.name ?? 'Unnamed Exercise'}</h3>
 					</span>
 				</button>
 				<div className='flex items-center gap-1 shrink-0'>
-					<p className={`text-xs ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : 'text-muted-foreground'}`}>
+					<p
+						className={`text-xs ${isExerciseCompleted ? 'text-green-800 dark:text-green-300' : 'text-muted-foreground'}`}>
 						{completedSets} / {sets.length}
 					</p>
 					<DropdownMenu>
