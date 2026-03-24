@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useCallback, useState } from 'react'
+import { useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/client'
 import { isExerciseType } from '@/lib/exerciseTypeIcons'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 import type { ExerciseCardData } from '@/types/view'
 
 const PAGE_SIZE = 20
@@ -21,16 +22,10 @@ export function DrawerExercisesInfiniteList({ children }: Props) {
 	const muscle = params.get('muscle') ?? undefined
 	const type = params.get('type') ?? undefined
 
-	const [exercises, setExercises] = useState<ExerciseCardData[]>([])
-	const [hasMore, setHasMore] = useState(false)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
-	const pageRef = useRef(0)
-	const sentinelRef = useRef<HTMLDivElement>(null)
-	const scrollContainerRef = useRef<HTMLDivElement>(null)
 	const supabaseRef = useRef(createClient())
+	const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-	const fetchExercises = useCallback(
+	const fetchPage = useCallback(
 		async (page: number): Promise<ExerciseCardData[]> => {
 			const from = page * PAGE_SIZE
 			const to = from + PAGE_SIZE - 1
@@ -67,68 +62,11 @@ export function DrawerExercisesInfiniteList({ children }: Props) {
 		[search, muscle, type],
 	)
 
-	// Reset and load first page whenever filters change
-	useEffect(() => {
-		let cancelled = false
-		setLoading(true)
-		setError(null)
-		setExercises([])
-		setHasMore(false)
-		pageRef.current = 0
-
-		fetchExercises(0)
-			.then(data => {
-				if (cancelled) return
-				setExercises(data)
-				setHasMore(data.length === PAGE_SIZE)
-				pageRef.current = 1
-			})
-			.catch(err => {
-				if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load exercises.')
-			})
-			.finally(() => {
-				if (!cancelled) setLoading(false)
-			})
-
-		return () => {
-			cancelled = true
-		}
-	}, [fetchExercises])
-
-	const fetchMore = useCallback(async () => {
-		if (loading || !hasMore) return
-		setLoading(true)
-
-		try {
-			const data = await fetchExercises(pageRef.current)
-			setExercises(prev => [...prev, ...data])
-			setHasMore(data.length === PAGE_SIZE)
-			pageRef.current += 1
-		} catch (err) {
-			console.error('Failed to load more exercises:', err)
-		} finally {
-			setLoading(false)
-		}
-	}, [loading, hasMore, fetchExercises])
-
-	const fetchMoreRef = useRef(fetchMore)
-	fetchMoreRef.current = fetchMore
-
-	useEffect(() => {
-		const sentinel = sentinelRef.current
-		const container = scrollContainerRef.current
-		if (!sentinel || !container) return
-
-		const observer = new IntersectionObserver(
-			entries => {
-				if (entries[0].isIntersecting) void fetchMoreRef.current()
-			},
-			{ root: container, rootMargin: '100px' },
-		)
-
-		observer.observe(sentinel)
-		return () => observer.disconnect()
-	}, [])
+	const { items: exercises, loading, error, sentinelRef } = useInfiniteScroll({
+		fetchPage,
+		pageSize: PAGE_SIZE,
+		scrollRoot: scrollContainerRef,
+	})
 
 	return (
 		<div ref={scrollContainerRef} className='overflow-y-auto flex-1 min-h-0'>
