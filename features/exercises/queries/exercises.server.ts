@@ -36,7 +36,10 @@ export async function fetchInitialExercises(
 		exercise_name,
 		primaryMuscle:muscle_groups!exercises_primary_muscle_id_fkey ( id, name ),
 		secondary_muscle_ids,
-		type
+		type,
+		tracking_type,
+		weight_type,
+		is_unilateral
 	`)
 
 	if (search) query = query.ilike('exercise_name', `%${search}%`)
@@ -59,6 +62,9 @@ export async function fetchInitialExercises(
 			primaryMuscle: primary ? { id: primary.id, name: primary.name } : null,
 			secondaryMuscles,
 			type: item.type,
+			trackingType: item.tracking_type,
+			weightType: item.weight_type,
+			isUnilateral: item.is_unilateral,
 		}
 	})
 }

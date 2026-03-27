@@ -12,12 +12,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 
 type SetData = {
 	reps: number
+	durationSec: number
 	weight: number
 	intensity: number
 	completed: boolean
 }
 
-const DEFAULT_SET = { reps: 0, weight: 0, intensity: 0, completed: false }
+const DEFAULT_SET: SetData = { reps: 0, durationSec: 0, weight: 0, intensity: 0, completed: false }
 const DEFAULT_SET_COUNT = 3
 
 const INTENSITY_LEVELS = Array.from({ length: 10 }, (_, index) => index + 1)
@@ -26,6 +27,7 @@ const createDefaultSets = () => Array.from({ length: DEFAULT_SET_COUNT }, () => 
 
 const normalizeSet = (set?: Partial<SetData>): SetData => ({
 	reps: set?.reps ?? 0,
+	durationSec: set?.durationSec ?? 0,
 	weight: set?.weight ?? 0,
 	intensity: set?.intensity ?? 0,
 	completed: Boolean(set?.completed),
@@ -65,7 +67,11 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 		if (isExerciseCompleted) onOpenChange(false)
 	}, [isExerciseCompleted])
 
-	const isSetReady = (set: SetData) => set.reps > 0 && set.weight > 0 && set.intensity > 0
+	const isSetReady = (set: SetData) => {
+		const hasActivity = exercise.trackingType === 'duration' ? set.durationSec > 0 : set.reps > 0
+		const hasWeight = exercise.weightType === 'weighted' ? set.weight > 0 : true
+		return hasActivity && hasWeight && set.intensity > 0
+	}
 
 	const syncExercise = (nextSets: SetData[]) => {
 		upsertExercise({
@@ -113,7 +119,7 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 	}
 
 	const addSet = () => {
-		const newSets = [...sets, { reps: 0, weight: 0, intensity: 0, completed: false }]
+		const newSets = [...sets, { ...DEFAULT_SET }]
 		setSets(newSets)
 		syncExercise(newSets)
 	}
@@ -206,26 +212,43 @@ export default function WorkoutExerciseCard({ exercise, isOpen, onOpenChange }: 
 									</p>
 									<div className='row-start-2 col-span-3 w-full flex flex-col gap-2 md:row-auto md:col-auto md:flex-1'>
 										<div className='grid grid-cols-1 gap-2 w-full sm:grid-cols-2 md:flex md:items-center md:gap-4'>
-											<InputGroup className='w-full md:max-w-40'>
-												<InputGroupInput
-													type='number'
-													min={0}
-													disabled={set.completed}
-													value={set.reps || ''}
-													onChange={e => updateSet(index, 'reps', Number(e.target.value))}
-												/>
-												<InputGroupAddon align='inline-end'>reps</InputGroupAddon>
-											</InputGroup>
-											<InputGroup className='w-full md:max-w-40'>
-												<InputGroupInput
-													type='number'
-													min={0}
-													disabled={set.completed}
-													value={set.weight || ''}
-													onChange={e => updateSet(index, 'weight', Number(e.target.value))}
-												/>
-												<InputGroupAddon align='inline-end'>kg</InputGroupAddon>
-											</InputGroup>
+											{exercise.trackingType === 'duration' ? (
+												<InputGroup className='w-full md:max-w-40'>
+													<InputGroupInput
+														type='number'
+														min={0}
+														disabled={set.completed}
+														value={set.durationSec || ''}
+														onChange={e => updateSet(index, 'durationSec', Number(e.target.value))}
+													/>
+													<InputGroupAddon align='inline-end'>sec</InputGroupAddon>
+												</InputGroup>
+											) : (
+												<InputGroup className='w-full md:max-w-40'>
+													<InputGroupInput
+														type='number'
+														min={0}
+														disabled={set.completed}
+														value={set.reps || ''}
+														onChange={e => updateSet(index, 'reps', Number(e.target.value))}
+													/>
+													<InputGroupAddon align='inline-end'>
+														{exercise.isUnilateral ? 'per side' : 'reps'}
+													</InputGroupAddon>
+												</InputGroup>
+											)}
+											{exercise.weightType !== 'bodyweight' && (
+												<InputGroup className='w-full md:max-w-40'>
+													<InputGroupInput
+														type='number'
+														min={0}
+														disabled={set.completed}
+														value={set.weight || ''}
+														onChange={e => updateSet(index, 'weight', Number(e.target.value))}
+													/>
+													<InputGroupAddon align='inline-end'>kg</InputGroupAddon>
+												</InputGroup>
+											)}
 										</div>
 										<div className='grid w-full gap-1'>
 											<Label className='text-muted-foreground text-xs'>Intensity</Label>

@@ -5,7 +5,8 @@ import type { Database } from '@/types/database.types'
 type AppSupabaseClient = SupabaseClient<Database>
 
 type SetEntry = {
-	reps: number
+	reps?: number
+	durationSec?: number
 	weight?: number
 	intensity?: number
 }
@@ -57,7 +58,8 @@ export async function saveSession(
 
 			return exercise.sets.map(set => ({
 				session_id: insertedSession.id,
-				reps: set.reps,
+				reps: set.reps ?? null,
+				duration_sec: set.durationSec ?? null,
 				weight: set.weight ?? null,
 				intensity: set.intensity ?? null,
 				user_id: user.id,

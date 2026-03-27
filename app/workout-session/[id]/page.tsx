@@ -42,7 +42,10 @@ export default async function WorkoutSessionPage({
 			`
 	exercise:exercises (
 	  id,
-	  exercise_name
+	  exercise_name,
+	  tracking_type,
+	  weight_type,
+	  is_unilateral
 	)
   `,
 		)
@@ -52,6 +55,9 @@ export default async function WorkoutSessionPage({
 		workoutExercises?.map(item => ({
 			id: item.exercise.id,
 			name: item.exercise.exercise_name,
+			trackingType: item.exercise.tracking_type,
+			weightType: item.exercise.weight_type,
+			isUnilateral: item.exercise.is_unilateral,
 		})) ?? []
 
 	const { muscles, error: musclesError } = await fetchMuscleGroups(supabase)

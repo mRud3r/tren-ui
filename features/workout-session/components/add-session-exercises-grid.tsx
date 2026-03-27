@@ -23,7 +23,13 @@ export function AddSessionExercisesGrid({ exercises, onSelect }: Props) {
 					key={exercise.id}
 					type='button'
 					onClick={() => {
-						addSessionExercise({ id: exercise.id, name: exercise.name })
+						addSessionExercise({
+							id: exercise.id,
+							name: exercise.name,
+							trackingType: exercise.trackingType,
+							weightType: exercise.weightType,
+							isUnilateral: exercise.isUnilateral,
+						})
 						onSelect()
 					}}
 					className='text-left rounded-xl'>
