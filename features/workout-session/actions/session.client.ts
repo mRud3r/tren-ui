@@ -20,7 +20,7 @@ type ExerciseState = {
 export async function saveSession(
 	supabase: AppSupabaseClient,
 	{ workoutId, exercises }: { workoutId: number; exercises: ExerciseState[] },
-): Promise<void> {
+): Promise<{ sessionId: number }> {
 	const {
 		data: { user },
 		error: userError,
@@ -71,4 +71,6 @@ export async function saveSession(
 			if (exerciseSetError) throw exerciseSetError
 		}
 	}
+
+	return { sessionId: createdSession.id }
 }
