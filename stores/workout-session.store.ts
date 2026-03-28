@@ -3,7 +3,8 @@ import { persist } from 'zustand/middleware'
 import type { WorkoutExercise } from '@/types/workout-session.types'
 
 type SetEntry = {
-	reps: number
+	reps?: number
+	durationSec?: number
 	weight?: number
 	intensity?: number
 	completed?: boolean
@@ -96,7 +97,7 @@ export const useWorkoutSessionStore = create<WorkoutSessionState>()(
 		}),
 		{
 			name: 'workout-session-store',
-			version: 2,
+			version: 3,
 			migrate: persistedState => {
 				const state = persistedState as Partial<PersistedWorkoutSessionState> | undefined
 

@@ -5,7 +5,8 @@ import type { Database } from '@/types/database.types'
 type AppSupabaseClient = SupabaseClient<Database>
 
 type SetEntry = {
-	reps: number
+	reps?: number
+	durationSec?: number
 	weight?: number
 	intensity?: number
 }
@@ -19,7 +20,7 @@ type ExerciseState = {
 export async function saveSession(
 	supabase: AppSupabaseClient,
 	{ workoutId, exercises }: { workoutId: number; exercises: ExerciseState[] },
-): Promise<void> {
+): Promise<{ sessionId: number }> {
 	const {
 		data: { user },
 		error: userError,
@@ -57,7 +58,8 @@ export async function saveSession(
 
 			return exercise.sets.map(set => ({
 				session_id: insertedSession.id,
-				reps: set.reps,
+				reps: set.reps ?? null,
+				duration_sec: set.durationSec ?? null,
 				weight: set.weight ?? null,
 				intensity: set.intensity ?? null,
 				user_id: user.id,
@@ -69,4 +71,6 @@ export async function saveSession(
 			if (exerciseSetError) throw exerciseSetError
 		}
 	}
+
+	return { sessionId: createdSession.id }
 }

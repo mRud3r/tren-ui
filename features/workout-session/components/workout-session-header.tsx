@@ -15,6 +15,8 @@ import {
 	AlertDialogCancel,
 	AlertDialogFooter,
 	AlertDialogTitle,
+	AlertDialogHeader,
+	AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
 
 type WorkoutSessionHeaderProps = {
@@ -69,24 +71,29 @@ export default function WorkoutSessionHeader({ workoutId, workoutLabel }: Workou
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
-						<AlertDialogTitle>Leave workout session</AlertDialogTitle>
-						<p>Are you sure you want to leave the workout session?</p>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Do you want do abandon the session?</AlertDialogTitle>
+							<AlertDialogDescription>
+								this will clear all your progress and you will not be able to resume this session later.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
 							<AlertDialogAction
+								variant={'destructive'}
 								onClick={() => {
 									clearWorkoutSession()
 									router.push('/dashboard/workouts')
 								}}>
-								Continue
+								Abandon
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>
 				<h1 className='font-semibold md:text-xl'>
 					{workoutLabel}{' '}
-					<span className='text-muted-foreground ms-4'>
-						{progress.value}% ({progress.completedSets}/{progress.totalSets})
+					<span className='text-muted-foreground ms-1'>
+						({progress.completedSets}/{progress.totalSets})
 					</span>
 				</h1>
 				<FinishWorkoutButton workoutId={workoutId} canSave={progress.value === 100} />
