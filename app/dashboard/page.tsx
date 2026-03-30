@@ -17,12 +17,12 @@ export default async function DashboardPage() {
 		.select(
 			`
     id,
-			created_at,
+		created_at,
     workout_id,
     workout:workouts (
       id,
       name,
-			description
+		description
     )
   `,
 		)

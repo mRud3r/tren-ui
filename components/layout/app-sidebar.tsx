@@ -1,4 +1,4 @@
-import { Calendar, Home, Dumbbell, TrendingUp } from 'lucide-react'
+import { Calendar, ClipboardList, Dumbbell, Home } from 'lucide-react'
 import Link from 'next/link'
 
 import {
@@ -19,6 +19,11 @@ const items = [
 		icon: Home,
 	},
 	{
+		title: 'Plans',
+		url: '/dashboard/plans',
+		icon: ClipboardList,
+	},
+	{
 		title: 'Workouts',
 		url: '/dashboard/workouts',
 		icon: Calendar,
@@ -27,7 +32,7 @@ const items = [
 		title: 'Exercises',
 		url: '/dashboard/exercises',
 		icon: Dumbbell,
-	}
+	},
 ]
 
 export function AppSidebar() {
