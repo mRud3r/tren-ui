@@ -5,23 +5,18 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import type { WorkoutCardData } from '@/types/workout.types'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Spinner } from '@/components/ui/spinner'
 import { createPlan } from '../actions/plans.client'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-export function AddPlanForm({ workouts }: { workouts: WorkoutCardData[] }) {
+export function AddPlanForm({ workouts, id }: { workouts: WorkoutCardData[]; id?: string }) {
 	const supabase = createClient()
 	const router = useRouter()
 
 	const [name, setName] = useState('')
-	const [description, setDescription] = useState('')
 	const [dayWorkouts, setDayWorkouts] = useState<Record<number, number | null>>({})
 	const [saving, setSaving] = useState(false)
 
@@ -43,7 +38,7 @@ export function AddPlanForm({ workouts }: { workouts: WorkoutCardData[] }) {
 
 		setSaving(true)
 		try {
-			await createPlan(supabase, { name: name.trim(), description: description.trim() || undefined, days })
+			await createPlan(supabase, { name: name.trim(), days })
 			toast.success('Plan created')
 			router.push('/dashboard/plans')
 			router.refresh()
@@ -55,30 +50,15 @@ export function AddPlanForm({ workouts }: { workouts: WorkoutCardData[] }) {
 	}
 
 	return (
-		<div className='space-y-8'>
-			<div className='space-y-4'>
-				<div className='space-y-2'>
-					<Label htmlFor='plan-name'>Plan name</Label>
-					<Input
-						id='plan-name'
-						placeholder='e.g. Push Pull Legs'
-						value={name}
-						onChange={e => setName(e.target.value)}
-						disabled={saving}
-					/>
-				</div>
-				<div className='space-y-2'>
-					<Label htmlFor='plan-desc'>Description (optional)</Label>
-					<Textarea
-						id='plan-desc'
-						placeholder='Short description...'
-						value={description}
-						onChange={e => setDescription(e.target.value)}
-						rows={2}
-						disabled={saving}
-					/>
-				</div>
-			</div>
+		<form id={id} onSubmit={e => { e.preventDefault(); void handleSave() }} className='flex flex-col gap-6'>
+			<Input
+				type='text'
+				placeholder='Plan name...'
+				value={name}
+				onChange={e => setName(e.target.value)}
+				disabled={saving}
+				className='h-auto rounded-none border-0 border-b border-border/35 px-2 py-2 text-xl font-medium md:text-xl shadow-none focus-visible:border-b focus-visible:border-foreground/20 focus-visible:ring-0'
+			/>
 
 			<div className='space-y-3'>
 				<div>
@@ -111,16 +91,6 @@ export function AddPlanForm({ workouts }: { workouts: WorkoutCardData[] }) {
 					))}
 				</div>
 			</div>
-
-			<div className='flex gap-3'>
-				<Button onClick={handleSave} disabled={!name.trim() || saving}>
-					{saving ? <Spinner /> : null}
-					{saving ? 'Saving...' : 'Save plan'}
-				</Button>
-				<Button variant='ghost' onClick={() => router.back()} disabled={saving}>
-					Cancel
-				</Button>
-			</div>
-		</div>
+		</form>
 	)
 }
