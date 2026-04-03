@@ -1,7 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
-
-type AppSupabaseClient = SupabaseClient<Database>
+import { eq, desc } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workoutPlans } from '@/lib/db/schema'
 
 export type PlanDay = {
 	id: number
@@ -20,73 +19,62 @@ export type PlanWithDays = {
 	days: PlanDay[]
 }
 
-type RawPlanDay = {
-	id: number
-	day_index: number
-	workout_id: number
-	workouts: { name: string; workout_exercises: { id: number }[] } | null
-}
-
-type RawPlan = {
-	id: number
-	name: string
-	description: string | null
-	is_active: boolean
-	created_at: string
-	workout_plan_days: RawPlanDay[]
-}
-
-function transformPlan(raw: RawPlan): PlanWithDays {
+function transformPlan(raw: Awaited<ReturnType<typeof queryPlans>>[number]): PlanWithDays {
 	return {
 		id: raw.id,
 		name: raw.name,
 		description: raw.description,
-		isActive: raw.is_active,
-		createdAt: raw.created_at,
-		days: (raw.workout_plan_days ?? []).map(d => ({
+		isActive: raw.isActive,
+		createdAt: raw.createdAt?.toISOString() ?? '',
+		days: raw.days.map(d => ({
 			id: d.id,
-			dayIndex: d.day_index,
-			workoutId: d.workout_id,
-			workoutName: d.workouts?.name ?? '',
-			exerciseCount: d.workouts?.workout_exercises?.length ?? 0,
+			dayIndex: d.dayIndex,
+			workoutId: d.workoutId,
+			workoutName: d.workout?.name ?? '',
+			exerciseCount: d.workout?.exercises?.length ?? 0,
 		})),
 	}
 }
 
-const PLAN_SELECT = `
-  id, name, description, is_active, created_at,
-  workout_plan_days (
-    id, day_index, workout_id,
-    workouts ( name, workout_exercises(id) )
-  )
-` as const
-
-export async function fetchPlans(supabase: AppSupabaseClient, userId: string): Promise<PlanWithDays[]> {
-	const { data, error } = await supabase
-		.from('workout_plans')
-		.select(PLAN_SELECT)
-		.eq('user_id', userId)
-		.order('is_active', { ascending: false })
-		.order('created_at', { ascending: false })
-
-	if (error) throw error
-
-	return (data as unknown as RawPlan[]).map(transformPlan)
+function queryPlans(userId: string) {
+	return db.query.workoutPlans.findMany({
+		where: eq(workoutPlans.userId, userId),
+		orderBy: [desc(workoutPlans.isActive), desc(workoutPlans.createdAt)],
+		with: {
+			days: {
+				with: {
+					workout: {
+						with: {
+							exercises: { columns: { id: true } },
+						},
+					},
+				},
+			},
+		},
+	})
 }
 
-export async function fetchActivePlan(
-	supabase: AppSupabaseClient,
-	userId: string,
-): Promise<PlanWithDays | null> {
-	const { data, error } = await supabase
-		.from('workout_plans')
-		.select(PLAN_SELECT)
-		.eq('user_id', userId)
-		.eq('is_active', true)
-		.maybeSingle()
+export async function fetchPlans(userId: string): Promise<PlanWithDays[]> {
+	const data = await queryPlans(userId)
+	return data.map(transformPlan)
+}
 
-	if (error) throw error
+export async function fetchActivePlan(userId: string): Promise<PlanWithDays | null> {
+	const data = await db.query.workoutPlans.findFirst({
+		where: (wp, { and }) => and(eq(wp.userId, userId), eq(wp.isActive, true)),
+		with: {
+			days: {
+				with: {
+					workout: {
+						with: {
+							exercises: { columns: { id: true } },
+						},
+					},
+				},
+			},
+		},
+	})
+
 	if (!data) return null
-
-	return transformPlan(data as unknown as RawPlan)
+	return transformPlan(data)
 }

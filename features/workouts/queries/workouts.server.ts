@@ -1,33 +1,23 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-
-import type { Database, Tables } from '@/types/database.types'
+import { eq, asc } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workouts } from '@/lib/db/schema'
 import type { WorkoutCardData } from '../../../types/workout.types'
-
-type AppSupabaseClient = SupabaseClient<Database>
 
 const PAGE_SIZE = 20
 
-export async function fetchInitialWorkouts(
-	supabase: AppSupabaseClient,
-	userId: string,
-	page = 0,
-): Promise<WorkoutCardData[]> {
-	const from = page * PAGE_SIZE
-	const to = from + PAGE_SIZE - 1
+export async function fetchInitialWorkouts(userId: string, page = 0): Promise<WorkoutCardData[]> {
+	const data = await db.query.workouts.findMany({
+		where: eq(workouts.userId, userId),
+		with: { exercises: { columns: { id: true } } },
+		orderBy: [asc(workouts.id)],
+		limit: PAGE_SIZE,
+		offset: page * PAGE_SIZE,
+	})
 
-	const { data, error } = await supabase
-		.from('workouts')
-		.select('id, name, description, workout_exercises(id)')
-		.eq('user_id', userId)
-		.order('id', { ascending: true })
-		.range(from, to)
-
-	if (error) throw error
-
-	return ((data ?? []) as Array<Tables<'workouts'> & { workout_exercises: { id: number }[] | null }>).map(w => ({
+	return data.map(w => ({
 		id: w.id,
 		name: w.name,
 		description: w.description,
-		exerciseCount: Array.isArray(w.workout_exercises) ? w.workout_exercises.length : 0,
+		exerciseCount: w.exercises.length,
 	}))
 }

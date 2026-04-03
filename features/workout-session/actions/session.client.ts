@@ -1,8 +1,8 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+'use server'
 
-import type { Database } from '@/types/database.types'
-
-type AppSupabaseClient = SupabaseClient<Database>
+import { db } from '@/lib/db'
+import { workoutSession, exerciseSession, exerciseSet } from '@/lib/db/schema'
+import { getCurrentUserId } from '@/lib/auth'
 
 type SetEntry = {
 	reps?: number
@@ -17,58 +17,51 @@ type ExerciseState = {
 	notes?: string
 }
 
-export async function saveSession(
-	supabase: AppSupabaseClient,
-	{ workoutId, exercises }: { workoutId: number; exercises: ExerciseState[] },
-): Promise<{ sessionId: number }> {
-	const {
-		data: { user },
-		error: userError,
-	} = await supabase.auth.getUser()
-	if (userError || !user) throw userError ?? new Error('User not authenticated')
+export async function saveSession({
+	workoutId,
+	exercises,
+}: {
+	workoutId: number
+	exercises: ExerciseState[]
+}): Promise<{ sessionId: number }> {
+	const userId = getCurrentUserId()
 
-	const { data: createdSession, error: sessionError } = await supabase
-		.from('workout_session')
-		.insert({ workout_id: workoutId, user_id: user.id })
-		.select('id')
-		.single()
-
-	if (sessionError || !createdSession) throw sessionError ?? new Error('Failed to create workout session')
+	const [createdSession] = await db
+		.insert(workoutSession)
+		.values({ workoutId, userId })
+		.returning({ id: workoutSession.id })
 
 	if (exercises.length > 0) {
-		const exerciseRows = exercises.map(exercise => ({
-			session_id: createdSession.id,
-			exercise_id: exercise.exerciseId,
-			notes: exercise.notes ?? null,
-			user_id: user.id,
-		}))
-
-		const { data: insertedExerciseSessions, error: exerciseSessionError } = await supabase
-			.from('exercise_session')
-			.insert(exerciseRows)
-			.select('id, exercise_id')
-
-		if (exerciseSessionError) throw exerciseSessionError
+		const insertedExerciseSessions = await db
+			.insert(exerciseSession)
+			.values(
+				exercises.map(exercise => ({
+					sessionId: createdSession.id,
+					exerciseId: exercise.exerciseId,
+					notes: exercise.notes ?? null,
+					userId,
+				})),
+			)
+			.returning({ id: exerciseSession.id, exerciseId: exerciseSession.exerciseId })
 
 		const exercisesById = new Map(exercises.map(e => [e.exerciseId, e]))
 
-		const setRows = (insertedExerciseSessions ?? []).flatMap(insertedSession => {
-			const exercise = exercisesById.get(insertedSession.exercise_id)
+		const setRows = insertedExerciseSessions.flatMap(inserted => {
+			const exercise = exercisesById.get(inserted.exerciseId)
 			if (!exercise) return []
 
 			return exercise.sets.map(set => ({
-				session_id: insertedSession.id,
+				sessionId: inserted.id,
 				reps: set.reps ?? null,
-				duration_sec: set.durationSec ?? null,
-				weight: set.weight ?? null,
+				durationSec: set.durationSec ?? null,
+				weight: set.weight != null ? String(set.weight) : null,
 				intensity: set.intensity ?? null,
-				user_id: user.id,
+				userId,
 			}))
 		})
 
 		if (setRows.length > 0) {
-			const { error: exerciseSetError } = await supabase.from('exercise_set').insert(setRows)
-			if (exerciseSetError) throw exerciseSetError
+			await db.insert(exerciseSet).values(setRows)
 		}
 	}
 

@@ -7,14 +7,12 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { createClient } from '@/lib/supabase/client'
 import { useCreateWorkoutStore } from '@/stores/create-workout.store'
 import { createWorkout } from '../../actions/workouts.client'
 import type { ExerciseCardData } from '@/types/exercise.types'
 
 export function AddWorkoutSaveButton() {
 	const router = useRouter()
-	const supabase = createClient()
 
 	const name = useCreateWorkoutStore(state => state.name)
 	const exercisesMap = useCreateWorkoutStore(state => state.exercises)
@@ -41,7 +39,7 @@ export function AddWorkoutSaveButton() {
 		setErrorMessage(null)
 
 		try {
-			await createWorkout(supabase, { name, exercises: selectedExercises })
+			await createWorkout({ name, exercises: selectedExercises })
 			clear()
 			toast.success('Workout saved!')
 			router.push('/dashboard/workouts')

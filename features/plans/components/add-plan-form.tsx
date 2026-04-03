@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import type { WorkoutCardData } from '@/types/workout.types'
 import { X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -21,7 +20,6 @@ const DAYS = [
 ]
 
 export function AddPlanForm({ workouts, id }: { workouts: WorkoutCardData[]; id?: string }) {
-	const supabase = createClient()
 	const router = useRouter()
 
 	const [name, setName] = useState('')
@@ -46,7 +44,7 @@ export function AddPlanForm({ workouts, id }: { workouts: WorkoutCardData[]; id?
 
 		setSaving(true)
 		try {
-			await createPlan(supabase, { name: name.trim(), days })
+			await createPlan({ name: name.trim(), days })
 			toast.success('Plan created')
 			router.push('/dashboard/plans')
 			router.refresh()

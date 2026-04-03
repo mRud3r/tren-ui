@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CheckCircle2, ChevronRight } from 'lucide-react'
+import { eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workoutSession } from '@/lib/db/schema'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/server'
 
 export default async function WorkoutSummaryPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -12,52 +14,39 @@ export default async function WorkoutSummaryPage({ params }: { params: Promise<{
 		notFound()
 	}
 
-	const supabase = await createClient()
-
-	const {
-		data: { user },
-		error: userError,
-	} = await supabase.auth.getUser()
-
-	if (userError || !user) {
-		notFound()
-	}
-
-	const { data: session } = await supabase
-		.from('workout_session')
-		.select(
-			`
-			id,
-			created_at,
-			workout:workouts (name),
-			exercise_session (
-				id,
-				notes,
-				exercise:exercises (exercise_name, tracking_type, weight_type),
-				exercise_set (reps, duration_sec, weight, intensity)
-			)
-		`,
-		)
-		.eq('id', sessionId)
-		.eq('user_id', user.id)
-		.single()
+	const session = await db.query.workoutSession.findFirst({
+		where: eq(workoutSession.id, sessionId),
+		with: {
+			workout: { columns: { name: true } },
+			exerciseSessions: {
+				with: {
+					exercise: {
+						columns: { exerciseName: true, trackingType: true, weightType: true },
+					},
+					sets: {
+						columns: { reps: true, durationSec: true, weight: true, intensity: true },
+					},
+				},
+			},
+		},
+	})
 
 	if (!session) {
 		notFound()
 	}
 
-	const totalVolume = session.exercise_session.reduce((acc, es) => {
+	const totalVolume = session.exerciseSessions.reduce((acc, es) => {
 		return (
 			acc +
-			es.exercise_set.reduce((setAcc, s) => {
-				if (s.weight && s.reps) return setAcc + s.weight * s.reps
+			es.sets.reduce((setAcc, s) => {
+				if (s.weight != null && s.reps != null) return setAcc + Number(s.weight) * s.reps
 				return setAcc
 			}, 0)
 		)
 	}, 0)
 
-	const allIntensities = session.exercise_session
-		.flatMap(es => es.exercise_set)
+	const allIntensities = session.exerciseSessions
+		.flatMap(es => es.sets)
 		.map(s => s.intensity)
 		.filter((i): i is number => i != null && i > 0)
 
@@ -73,8 +62,8 @@ export default async function WorkoutSummaryPage({ params }: { params: Promise<{
 		return { border: 'border-red-500', text: 'text-red-500' }
 	}
 
-	const formattedDate = session.created_at
-		? new Date(session.created_at).toLocaleDateString('en-US', {
+	const formattedDate = session.createdAt
+		? new Date(session.createdAt).toLocaleDateString('en-US', {
 				weekday: 'long',
 				year: 'numeric',
 				month: 'long',
@@ -98,7 +87,7 @@ export default async function WorkoutSummaryPage({ params }: { params: Promise<{
 					</div>
 				)}
 				<div className='flex flex-col items-center justify-center w-36 h-36 rounded-full border-4 border-primary gap-1'>
-					<p className='font-bold text-xl leading-none'>{session.exercise_session.length}</p>
+					<p className='font-bold text-xl leading-none'>{session.exerciseSessions.length}</p>
 					<p className='text-xs text-muted-foreground'>exercises</p>
 				</div>
 			</div>

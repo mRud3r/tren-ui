@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { createClient } from '@/lib/supabase/client'
 import { useWorkoutSessionStore } from '@/stores/workout-session.store'
 import { saveSession } from '../actions/session.client'
 import { Save } from 'lucide-react'
@@ -17,7 +16,6 @@ type FinishWorkoutButtonProps = {
 
 export default function FinishWorkoutButton({ workoutId, canSave = true }: FinishWorkoutButtonProps) {
 	const router = useRouter()
-	const supabase = createClient()
 	const [loading, setLoading] = useState(false)
 	const [finished, setFinished] = useState(false)
 
@@ -27,7 +25,7 @@ export default function FinishWorkoutButton({ workoutId, canSave = true }: Finis
 		try {
 			setLoading(true)
 			const exercises = Object.values(useWorkoutSessionStore.getState().exercises)
-			const { sessionId } = await saveSession(supabase, { workoutId: Number(workoutId), exercises })
+			const { sessionId } = await saveSession({ workoutId: Number(workoutId), exercises })
 			setFinished(true)
 			router.replace(`/workout-session/summary/${sessionId}`)
 			useWorkoutSessionStore.getState().clear()

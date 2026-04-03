@@ -5,13 +5,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EllipsisVertical, SquarePen, Trash } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { deleteWorkout } from '../actions/workouts.client'
 
 export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
-	const supabase = createClient()
 	const router = useRouter()
 	const [deleting, setDeleting] = useState(false)
 	const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -26,7 +24,7 @@ export function WorkoutCardActions({ workoutId }: { workoutId: number }) {
 		setErrorMessage(null)
 
 		try {
-			await deleteWorkout(supabase, workoutId)
+			await deleteWorkout(workoutId)
 			toast.success('Workout deleted')
 			router.refresh()
 		} catch (error) {

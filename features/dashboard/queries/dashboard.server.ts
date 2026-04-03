@@ -1,7 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
-
-type AppSupabaseClient = SupabaseClient<Database>
+import { count, eq, gte, and } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workoutSession } from '@/lib/db/schema'
 
 export type DashboardStats = {
 	totalSessions: number
@@ -9,7 +8,7 @@ export type DashboardStats = {
 	thisMonthSessions: number
 }
 
-export async function fetchDashboardStats(supabase: AppSupabaseClient, userId: string): Promise<DashboardStats> {
+export async function fetchDashboardStats(userId: string): Promise<DashboardStats> {
 	const now = new Date()
 
 	const weekStart = new Date(now)
@@ -19,22 +18,20 @@ export async function fetchDashboardStats(supabase: AppSupabaseClient, userId: s
 	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
 	const [totalResult, weekResult, monthResult] = await Promise.all([
-		supabase.from('workout_session').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-		supabase
-			.from('workout_session')
-			.select('*', { count: 'exact', head: true })
-			.eq('user_id', userId)
-			.gte('created_at', weekStart.toISOString()),
-		supabase
-			.from('workout_session')
-			.select('*', { count: 'exact', head: true })
-			.eq('user_id', userId)
-			.gte('created_at', monthStart.toISOString()),
+		db.select({ count: count() }).from(workoutSession).where(eq(workoutSession.userId, userId)),
+		db
+			.select({ count: count() })
+			.from(workoutSession)
+			.where(and(eq(workoutSession.userId, userId), gte(workoutSession.createdAt, weekStart))),
+		db
+			.select({ count: count() })
+			.from(workoutSession)
+			.where(and(eq(workoutSession.userId, userId), gte(workoutSession.createdAt, monthStart))),
 	])
 
 	return {
-		totalSessions: totalResult.count ?? 0,
-		thisWeekSessions: weekResult.count ?? 0,
-		thisMonthSessions: monthResult.count ?? 0,
+		totalSessions: totalResult[0]?.count ?? 0,
+		thisWeekSessions: weekResult[0]?.count ?? 0,
+		thisMonthSessions: monthResult[0]?.count ?? 0,
 	}
 }

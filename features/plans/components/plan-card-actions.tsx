@@ -4,13 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EllipsisVertical, Trash } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { deletePlan } from '../actions/plans.client'
 
 export function PlanCardActions({ planId }: { planId: number }) {
-	const supabase = createClient()
 	const router = useRouter()
 	const [deleting, setDeleting] = useState(false)
 
@@ -21,7 +19,7 @@ export function PlanCardActions({ planId }: { planId: number }) {
 
 		setDeleting(true)
 		try {
-			await deletePlan(supabase, planId)
+			await deletePlan(planId)
 			toast.success('Plan deleted')
 			router.refresh()
 		} catch (err) {

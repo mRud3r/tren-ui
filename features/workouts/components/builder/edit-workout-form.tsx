@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Input } from '@/components/ui/input'
@@ -21,7 +20,6 @@ type EditWorkoutFormProps = {
 }
 
 export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
-	const supabase = createClient()
 	const router = useRouter()
 
 	const [name, setName] = useState(workout.name)
@@ -38,7 +36,7 @@ export function EditWorkoutForm({ workout }: EditWorkoutFormProps) {
 		setErrorMessage(null)
 
 		try {
-			await updateWorkout(supabase, { workoutId: workout.id, name, description })
+			await updateWorkout({ workoutId: workout.id, name, description })
 			toast.success('Changes saved!')
 			router.push('/dashboard/workouts')
 			router.refresh()

@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation'
+import { eq, and } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workouts } from '@/lib/db/schema'
+import { getCurrentUserId } from '@/lib/auth'
 import { EditWorkoutForm } from '@/features/workouts/components/builder/edit-workout-form'
-import { createClient } from '@/lib/supabase/server'
 
 export default async function EditWorkoutPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -10,24 +13,14 @@ export default async function EditWorkoutPage({ params }: { params: Promise<{ id
 		notFound()
 	}
 
-	const supabase = await createClient()
-	const {
-		data: { user },
-		error: userError,
-	} = await supabase.auth.getUser()
+	const userId = getCurrentUserId()
 
-	if (userError || !user) {
-		notFound()
-	}
+	const workout = await db.query.workouts.findFirst({
+		where: and(eq(workouts.id, workoutId), eq(workouts.userId, userId)),
+		columns: { id: true, name: true, description: true },
+	})
 
-	const { data: workout, error } = await supabase
-		.from('workouts')
-		.select('id, name, description')
-		.eq('id', workoutId)
-		.eq('user_id', user.id)
-		.single()
-
-	if (error || !workout) {
+	if (!workout) {
 		notFound()
 	}
 

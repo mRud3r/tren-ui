@@ -1,9 +1,8 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useCallback } from 'react'
 import Link from 'next/link'
 
-import { createClient } from '@/lib/supabase/client'
 import { Spinner } from '@/components/ui/spinner'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 import { fetchExercisesPage } from '../queries/exercises.client'
@@ -21,10 +20,8 @@ type Props = {
 }
 
 export function ExercisesInfiniteList({ initialExercises, initialHasMore, search, muscle, type }: Props) {
-	const supabaseRef = useRef(createClient())
-
 	const fetchPage = useCallback(
-		(page: number) => fetchExercisesPage(supabaseRef.current, page, { search, muscle, type }),
+		(page: number) => fetchExercisesPage(page, { search, muscle, type }),
 		[search, muscle, type],
 	)
 

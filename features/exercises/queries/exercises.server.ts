@@ -1,10 +1,10 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+'use server'
 
+import { ilike, eq, asc, and } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { exercises, muscleGroups } from '@/lib/db/schema'
 import { isExerciseType } from '@/lib/exerciseTypeIcons'
-import type { Database } from '@/types/database.types'
-import type { ExerciseCardData, MuscleGroup } from '../../../types/exercise.types'
-
-type AppSupabaseClient = SupabaseClient<Database>
+import type { ExerciseCardData, MuscleGroup, ExerciseType } from '../../../types/exercise.types'
 
 const PAGE_SIZE = 20
 
@@ -14,57 +14,48 @@ export type ExerciseFilters = {
 	type?: string
 }
 
-export async function fetchMuscleGroups(
-	supabase: AppSupabaseClient,
-): Promise<{ muscles: MuscleGroup[]; error: boolean }> {
-	const { data, error } = await supabase.from('muscle_groups').select('id, name').order('name')
-	return { muscles: data ?? [], error: Boolean(error) }
+export async function fetchMuscleGroups(): Promise<{ muscles: MuscleGroup[]; error: boolean }> {
+	try {
+		const data = await db
+			.select({ id: muscleGroups.id, name: muscleGroups.name })
+			.from(muscleGroups)
+			.orderBy(asc(muscleGroups.name))
+		return { muscles: data, error: false }
+	} catch {
+		return { muscles: [], error: true }
+	}
 }
 
 export async function fetchInitialExercises(
-	supabase: AppSupabaseClient,
 	filters: ExerciseFilters,
 	musclesById: Map<number, MuscleGroup>,
 	page = 0,
 ): Promise<ExerciseCardData[]> {
 	const { search, muscle, type } = filters
-	const from = page * PAGE_SIZE
-	const to = from + PAGE_SIZE - 1
 
-	let query = supabase.from('exercises').select(`
-		id,
-		exercise_name,
-		primaryMuscle:muscle_groups!exercises_primary_muscle_id_fkey ( id, name ),
-		secondary_muscle_ids,
-		type,
-		tracking_type,
-		weight_type,
-		is_unilateral
-	`)
+	const conditions = []
+	if (search) conditions.push(ilike(exercises.exerciseName, `%${search}%`))
+	if (muscle) conditions.push(eq(exercises.primaryMuscleId, Number(muscle)))
+	if (type && isExerciseType(type)) conditions.push(eq(exercises.type, type as ExerciseType))
 
-	if (search) query = query.ilike('exercise_name', `%${search}%`)
-	if (muscle) query = query.eq('primary_muscle_id', Number(muscle))
-	if (type && isExerciseType(type)) query = query.eq('type', type)
-
-	const { data, error } = await query.order('id', { ascending: true }).range(from, to)
-
-	if (error) throw error
-
-	return (data ?? []).map(item => {
-		const primary = Array.isArray(item.primaryMuscle) ? (item.primaryMuscle[0] ?? null) : (item.primaryMuscle ?? null)
-		const secondaryMuscles = Array.isArray(item.secondary_muscle_ids)
-			? item.secondary_muscle_ids.map(mid => musclesById.get(mid)).filter((x): x is MuscleGroup => Boolean(x))
-			: []
-
-		return {
-			id: item.id,
-			name: item.exercise_name,
-			primaryMuscle: primary ? { id: primary.id, name: primary.name } : null,
-			secondaryMuscles,
-			type: item.type,
-			trackingType: item.tracking_type,
-			weightType: item.weight_type,
-			isUnilateral: item.is_unilateral,
-		}
+	const data = await db.query.exercises.findMany({
+		with: { primaryMuscle: true },
+		where: conditions.length > 0 ? and(...conditions) : undefined,
+		orderBy: [asc(exercises.id)],
+		limit: PAGE_SIZE,
+		offset: page * PAGE_SIZE,
 	})
+
+	return data.map(item => ({
+		id: item.id,
+		name: item.exerciseName,
+		primaryMuscle: item.primaryMuscle ? { id: item.primaryMuscle.id, name: item.primaryMuscle.name } : null,
+		secondaryMuscles: (item.secondaryMuscleIds ?? [])
+			.map(mid => musclesById.get(mid))
+			.filter((x): x is MuscleGroup => Boolean(x)),
+		type: item.type,
+		trackingType: item.trackingType,
+		weightType: item.weightType,
+		isUnilateral: item.isUnilateral,
+	}))
 }

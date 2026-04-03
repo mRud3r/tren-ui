@@ -3,7 +3,6 @@
 import { useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/client'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
@@ -22,11 +21,10 @@ export function DrawerExercisesInfiniteList({ children }: Props) {
 	const muscle = params.get('muscle') ?? undefined
 	const type = params.get('type') ?? undefined
 
-	const supabaseRef = useRef(createClient())
 	const scrollContainerRef = useRef<HTMLDivElement>(null)
 
 	const fetchPage = useCallback(
-		(page: number) => fetchExercisesPage(supabaseRef.current, page, { search, muscle, type }),
+		(page: number) => fetchExercisesPage(page, { search, muscle, type }),
 		[search, muscle, type],
 	)
 
