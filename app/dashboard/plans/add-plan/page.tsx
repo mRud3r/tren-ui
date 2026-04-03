@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 const FORM_ID = 'add-plan-form'
 
 export default async function AddPlanPage() {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 	const workouts = await fetchInitialWorkouts(userId)
 
 	return (

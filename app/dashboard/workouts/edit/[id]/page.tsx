@@ -13,7 +13,7 @@ export default async function EditWorkoutPage({ params }: { params: Promise<{ id
 		notFound()
 	}
 
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	const workout = await db.query.workouts.findFirst({
 		where: and(eq(workouts.id, workoutId), eq(workouts.userId, userId)),

@@ -1,4 +1,9 @@
-// Temporary placeholder until auth is implemented in Phase 4
-export function getCurrentUserId(): string {
-	return 'temp-user-id'
+import { auth } from '@/lib/auth/server'
+
+export async function getCurrentUserId(): Promise<string> {
+	const { data: session } = await auth.getSession()
+	if (!session?.user?.id) {
+		throw new Error('Unauthorized')
+	}
+	return session.user.id
 }

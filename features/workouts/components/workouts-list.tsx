@@ -5,7 +5,7 @@ import { WorkoutsInfiniteList } from './workouts-infinite-list'
 const PAGE_SIZE = 20
 
 export const WorkoutsList = async () => {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	let workouts: Awaited<ReturnType<typeof fetchInitialWorkouts>>
 	try {

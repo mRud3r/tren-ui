@@ -14,7 +14,7 @@ export async function createPlan({
 	description?: string
 	days: { dayIndex: number; workoutId: number }[]
 }): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	await db.transaction(async tx => {
 		const [{ planCount }] = await tx
@@ -36,7 +36,7 @@ export async function createPlan({
 }
 
 export async function deletePlan(planId: number): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 	await db.delete(workoutPlans).where(eq(workoutPlans.id, planId)).returning()
 	// Note: user check will be added when auth is implemented
 	void userId
@@ -47,7 +47,7 @@ export async function deactivatePlan(planId: number): Promise<void> {
 }
 
 export async function setActivePlan(planId: number): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	await db.transaction(async tx => {
 		await tx.update(workoutPlans).set({ isActive: false }).where(eq(workoutPlans.userId, userId))

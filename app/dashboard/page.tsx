@@ -8,7 +8,7 @@ import { DashboardStats } from '@/features/dashboard/components/dashboard-stats'
 import { TodayWorkout } from '@/features/dashboard/components/today-workout'
 
 export default async function DashboardPage() {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	const [stats, activePlan] = await Promise.all([
 		fetchDashboardStats(userId),

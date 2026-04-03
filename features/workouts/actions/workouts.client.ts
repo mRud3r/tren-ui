@@ -7,7 +7,7 @@ import { getCurrentUserId } from '@/lib/auth'
 import type { ExerciseCardData } from '@/types/exercise.types'
 
 export async function deleteWorkout(workoutId: number): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	await db.transaction(async tx => {
 		const workout = await tx.query.workouts.findFirst({
@@ -51,7 +51,7 @@ export async function createWorkout({
 	name: string
 	exercises: ExerciseCardData[]
 }): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	await db.transaction(async tx => {
 		const [workout] = await tx
@@ -80,7 +80,7 @@ export async function updateWorkout({
 	name: string
 	description: string
 }): Promise<void> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	await db
 		.update(workouts)

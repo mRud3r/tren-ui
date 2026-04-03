@@ -9,7 +9,7 @@ import type { WorkoutCardData } from '../../../types/workout.types'
 const PAGE_SIZE = 20
 
 export async function fetchWorkoutsPage(page: number): Promise<WorkoutCardData[]> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	const data = await db.query.workouts.findMany({
 		where: eq(workouts.userId, userId),

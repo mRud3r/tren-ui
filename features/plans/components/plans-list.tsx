@@ -3,7 +3,7 @@ import { fetchPlans } from '../queries/plans.server'
 import { PlanCard } from './plan-card'
 
 export async function PlansList() {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	let plans: Awaited<ReturnType<typeof fetchPlans>>
 	try {

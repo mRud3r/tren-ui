@@ -24,7 +24,7 @@ export async function saveSession({
 	workoutId: number
 	exercises: ExerciseState[]
 }): Promise<{ sessionId: number }> {
-	const userId = getCurrentUserId()
+	const userId = await getCurrentUserId()
 
 	const [createdSession] = await db
 		.insert(workoutSession)
