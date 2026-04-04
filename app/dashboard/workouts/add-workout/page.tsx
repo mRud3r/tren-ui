@@ -1,13 +1,11 @@
-import { AddWorkoutExerciseDrawer } from '@/features/workouts/components/builder/add-workout-exercise-drawer'
-import { AddWorkoutNameInput } from '@/features/workouts/components/builder/add-workout-name-input'
-import { AddWorkoutSaveButton } from '@/features/workouts/components/builder/add-workout-save-button'
-import { AddWorkoutSelectedExercises } from '@/features/workouts/components/builder/add-workout-selected-exercises'
-import { createClient } from '@/lib/supabase/server'
-import { fetchMuscleGroups } from '@/features/exercises/queries/exercises.server'
+import { AddWorkoutExerciseDrawer } from '@/components/workouts/builder/add-workout-exercise-drawer'
+import { AddWorkoutNameInput } from '@/components/workouts/builder/add-workout-name-input'
+import { AddWorkoutSaveButton } from '@/components/workouts/builder/add-workout-save-button'
+import { AddWorkoutSelectedExercises } from '@/components/workouts/builder/add-workout-selected-exercises'
+import { fetchMuscleGroups } from '@/data/exercises.server'
 
 export default async function NewWorkoutPage() {
-	const supabase = await createClient()
-	const { muscles, error: musclesError } = await fetchMuscleGroups(supabase)
+	const { muscles, error: musclesError } = await fetchMuscleGroups()
 
 	return (
 		<div className='w-full space-y-6 p-4 h-full'>

@@ -1,22 +1,18 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { fetchActivePlan } from '@/features/plans/queries/plans.server'
-import { fetchDashboardStats } from '@/features/dashboard/queries/dashboard.server'
-import { DashboardStats } from '@/features/dashboard/components/dashboard-stats'
-import { TodayWorkout } from '@/features/dashboard/components/today-workout'
+import { eq, and, gte, lte } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { workoutSession } from '@/lib/db/schema'
+import { getCurrentUserId } from '@/lib/auth'
+import { fetchActivePlan } from '@/data/plans.server'
+import { fetchDashboardStats } from '@/data/dashboard.server'
+import { DashboardStats } from '@/components/dashboard/dashboard-stats'
+import { TodayWorkout } from '@/components/dashboard/today-workout'
 
 export default async function DashboardPage() {
-	const supabase = await createClient()
-
-	const {
-		data: { user },
-		error,
-	} = await supabase.auth.getUser()
-	if (error || !user) redirect('/auth/login')
+	const userId = await getCurrentUserId()
 
 	const [stats, activePlan] = await Promise.all([
-		fetchDashboardStats(supabase, user.id),
-		fetchActivePlan(supabase, user.id),
+		fetchDashboardStats(userId),
+		fetchActivePlan(userId),
 	])
 
 	let todayWorkoutSessionId: number | null = null
@@ -29,14 +25,15 @@ export default async function DashboardPage() {
 			const dayEnd = new Date()
 			dayEnd.setHours(23, 59, 59, 999)
 
-			const { data: todaySession } = await supabase
-				.from('workout_session')
-				.select('id')
-				.eq('user_id', user.id)
-				.eq('workout_id', todayPlanDay.workoutId)
-				.gte('created_at', dayStart.toISOString())
-				.lte('created_at', dayEnd.toISOString())
-				.maybeSingle()
+			const todaySession = await db.query.workoutSession.findFirst({
+				where: and(
+					eq(workoutSession.userId, userId),
+					eq(workoutSession.workoutId, todayPlanDay.workoutId),
+					gte(workoutSession.createdAt, dayStart),
+					lte(workoutSession.createdAt, dayEnd),
+				),
+				columns: { id: true },
+			})
 
 			todayWorkoutSessionId = todaySession?.id ?? null
 		}

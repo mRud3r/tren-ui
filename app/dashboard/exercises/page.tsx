@@ -1,7 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
-import { ExerciseSearch } from '@/features/exercises/components/exercise-search'
-import { ExercisesInfiniteList } from '@/features/exercises/components/exercises-infinite-list'
-import { fetchMuscleGroups, fetchInitialExercises } from '@/features/exercises/queries/exercises.server'
+import { ExerciseSearch } from '@/components/exercises/exercise-search'
+import { ExercisesInfiniteList } from '@/components/exercises/exercises-infinite-list'
+import { fetchMuscleGroups, fetchInitialExercises } from '@/data/exercises.server'
 
 const PAGE_SIZE = 20
 
@@ -14,15 +13,14 @@ export default async function ExercisesPage({
 		type?: string
 	}>
 }) {
-	const supabase = await createClient()
 	const { search, muscle, type } = await searchParams
 
-	const { muscles, error: musclesError } = await fetchMuscleGroups(supabase)
+	const { muscles, error: musclesError } = await fetchMuscleGroups()
 	const musclesById = new Map(muscles.map(m => [m.id, m]))
 
 	let exercises: Awaited<ReturnType<typeof fetchInitialExercises>>
 	try {
-		exercises = await fetchInitialExercises(supabase, { search, muscle, type }, musclesById)
+		exercises = await fetchInitialExercises({ search, muscle, type }, musclesById)
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'Unknown error'
 		return <div className='text-sm text-destructive'>Error: {message}</div>

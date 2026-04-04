@@ -1,22 +1,13 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { fetchInitialWorkouts } from '@/features/workouts/queries/workouts.server'
-import { AddPlanForm } from '@/features/plans/components/add-plan-form'
+import { getCurrentUserId } from '@/lib/auth'
+import { fetchInitialWorkouts } from '@/data/workouts.server'
+import { AddPlanForm } from '@/components/plans/add-plan-form'
 import { Button } from '@/components/ui/button'
 
 const FORM_ID = 'add-plan-form'
 
 export default async function AddPlanPage() {
-	const supabase = await createClient()
-
-	const {
-		data: { user },
-		error,
-	} = await supabase.auth.getUser()
-
-	if (error || !user) redirect('/auth/login')
-
-	const workouts = await fetchInitialWorkouts(supabase, user.id)
+	const userId = await getCurrentUserId()
+	const workouts = await fetchInitialWorkouts(userId)
 
 	return (
 		<div className='w-full space-y-6 p-4 h-full'>
