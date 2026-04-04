@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { workouts } from '@/lib/db/schema'
 import { getCurrentUserId } from '@/lib/auth'
-import { EditWorkoutForm } from '@/features/workouts/components/builder/edit-workout-form'
+import { EditWorkoutForm } from '@/components/workouts/builder/edit-workout-form'
 
 export default async function EditWorkoutPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params

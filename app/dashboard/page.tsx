@@ -2,10 +2,10 @@ import { eq, and, gte, lte } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { workoutSession } from '@/lib/db/schema'
 import { getCurrentUserId } from '@/lib/auth'
-import { fetchActivePlan } from '@/features/plans/queries/plans.server'
-import { fetchDashboardStats } from '@/features/dashboard/queries/dashboard.server'
-import { DashboardStats } from '@/features/dashboard/components/dashboard-stats'
-import { TodayWorkout } from '@/features/dashboard/components/today-workout'
+import { fetchActivePlan } from '@/data/plans.server'
+import { fetchDashboardStats } from '@/data/dashboard.server'
+import { DashboardStats } from '@/components/dashboard/dashboard-stats'
+import { TodayWorkout } from '@/components/dashboard/today-workout'
 
 export default async function DashboardPage() {
 	const userId = await getCurrentUserId()

@@ -1,6 +1,6 @@
-import { ExerciseSearch } from '@/features/exercises/components/exercise-search'
-import { ExercisesInfiniteList } from '@/features/exercises/components/exercises-infinite-list'
-import { fetchMuscleGroups, fetchInitialExercises } from '@/features/exercises/queries/exercises.server'
+import { ExerciseSearch } from '@/components/exercises/exercise-search'
+import { ExercisesInfiniteList } from '@/components/exercises/exercises-infinite-list'
+import { fetchMuscleGroups, fetchInitialExercises } from '@/data/exercises.server'
 
 const PAGE_SIZE = 20
 

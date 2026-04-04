@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { exercises, exerciseSession } from '@/lib/db/schema'
 import { getCurrentUserId } from '@/lib/auth'
-import { ExerciseStats, type SessionPoint } from '@/features/exercises/components/exercise-stats'
+import { ExerciseStats, type SessionPoint } from '@/components/exercises/exercise-stats'
 
 export default async function ExercisePage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params

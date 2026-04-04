@@ -1,6 +1,6 @@
 import { getCurrentUserId } from '@/lib/auth'
-import { fetchInitialWorkouts } from '@/features/workouts/queries/workouts.server'
-import { AddPlanForm } from '@/features/plans/components/add-plan-form'
+import { fetchInitialWorkouts } from '@/data/workouts.server'
+import { AddPlanForm } from '@/components/plans/add-plan-form'
 import { Button } from '@/components/ui/button'
 
 const FORM_ID = 'add-plan-form'

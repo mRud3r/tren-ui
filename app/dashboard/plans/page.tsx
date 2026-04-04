@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PlansList } from '@/features/plans/components/plans-list'
+import { PlansList } from '@/components/plans/plans-list'
 
 export default function PlansPage() {
 	return (

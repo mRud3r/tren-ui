@@ -1,8 +1,8 @@
-import { AddWorkoutExerciseDrawer } from '@/features/workouts/components/builder/add-workout-exercise-drawer'
-import { AddWorkoutNameInput } from '@/features/workouts/components/builder/add-workout-name-input'
-import { AddWorkoutSaveButton } from '@/features/workouts/components/builder/add-workout-save-button'
-import { AddWorkoutSelectedExercises } from '@/features/workouts/components/builder/add-workout-selected-exercises'
-import { fetchMuscleGroups } from '@/features/exercises/queries/exercises.server'
+import { AddWorkoutExerciseDrawer } from '@/components/workouts/builder/add-workout-exercise-drawer'
+import { AddWorkoutNameInput } from '@/components/workouts/builder/add-workout-name-input'
+import { AddWorkoutSaveButton } from '@/components/workouts/builder/add-workout-save-button'
+import { AddWorkoutSelectedExercises } from '@/components/workouts/builder/add-workout-selected-exercises'
+import { fetchMuscleGroups } from '@/data/exercises.server'
 
 export default async function NewWorkoutPage() {
 	const { muscles, error: musclesError } = await fetchMuscleGroups()

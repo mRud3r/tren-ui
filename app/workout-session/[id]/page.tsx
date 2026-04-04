@@ -2,9 +2,9 @@ import { notFound } from 'next/navigation'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { workouts, workoutExercises } from '@/lib/db/schema'
-import { fetchMuscleGroups } from '@/features/exercises/queries/exercises.server'
-import WorkoutExercisesList from '@/features/workout-session/components/workout-exercises-list'
-import WorkoutSessionHeader from '@/features/workout-session/components/workout-session-header'
+import { fetchMuscleGroups } from '@/data/exercises.server'
+import WorkoutExercisesList from '@/components/workout-session/workout-exercises-list'
+import WorkoutSessionHeader from '@/components/workout-session/workout-session-header'
 
 export default async function WorkoutSessionPage({
 	params,
