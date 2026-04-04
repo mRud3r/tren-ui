@@ -1,105 +1,328 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# TrenUI — Aplikacja do śledzenia treningów
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+**TrenUI** to webowa aplikacja do zarządzania treningami siłowymi, umożliwiająca tworzenie własnych planów treningowych, śledzenie postępów na żywo oraz przeglądanie historii i statystyk sesji. Aplikacja powstała jako projekt inżynierski i rozwiązuje problem braku prostego, szybkiego narzędzia do rejestrowania treningów bezpośrednio z przeglądarki — bez instalacji aplikacji mobilnej.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+---
 
-## Features
+## Spis treści
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+1. [Technologie](#technologie)
+2. [Wymagania systemowe](#wymagania-systemowe)
+3. [Instalacja i uruchomienie](#instalacja-i-uruchomienie)
+4. [Zmienne środowiskowe](#zmienne-środowiskowe)
+5. [Architektura i struktura katalogów](#architektura-i-struktura-katalogów)
+6. [Funkcjonalności](#funkcjonalności)
+7. [Baza danych](#baza-danych)
+8. [Testy](#testy)
+9. [Autor](#autor)
 
-## Demo
+---
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## Technologie
 
-## Deploy to Vercel
+Aplikacja została zbudowana z użyciem **Next.js 16** (App Router, React Server Components), **React 19**, **Drizzle ORM** oraz **PostgreSQL** hostowanego w serwisie Neon. Uwierzytelnianie realizuje **Neon Auth**. Interfejs oparty jest na bibliotece komponentów **shadcn/ui** (styl New York) z **Radix UI** i **Tailwind CSS 4**. Stan po stronie klienta zarządzany jest przez **Zustand** z persistencją w `localStorage`. Przeciąganie i upuszczanie ćwiczeń obsługuje **@dnd-kit**. Wykresy w statystykach renderuje **Recharts**.
 
-Vercel deployment will guide you through creating a Supabase account and project.
+| Warstwa | Technologia |
+|---------|-------------|
+| Framework | Next.js 16.1.6 (App Router) |
+| Biblioteka UI | React 19 |
+| Baza danych | PostgreSQL (Neon serverless) |
+| ORM | Drizzle ORM 0.45.2 |
+| Uwierzytelnianie | Better Auth |
+| Stan klienta | Zustand 5 |
+| Style | Tailwind CSS 4, shadcn/ui, Radix UI |
+| Wykresy | Recharts 3 |
+| Testowanie | Jest 30, React Testing Library 16 |
+| Język | TypeScript 5 |
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+---
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+## Wymagania systemowe
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+- **Node.js** w wersji ≥ 20
+- **npm** w wersji ≥ 10 (dostarczany wraz z Node.js 20)
+- Konto w serwisie [Neon](https://neon.tech) — wymagane do uruchomienia bazy danych i uwierzytelniania
+- System operacyjny: macOS, Linux lub Windows (z WSL2)
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+---
 
-## Clone and run locally
+## Instalacja i uruchomienie
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 1. Klonowanie repozytorium
 
-2. Create a Next.js app using the Supabase Starter template npx command
+```bash
+git clone https://github.com/mRud3r/tren-ui.git
+cd tren-ui
+```
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+### 2. Instalacja zależności
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+```bash
+npm install
+```
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+### 3. Konfiguracja zmiennych środowiskowych
 
-3. Use `cd` to change into the app's directory
+Utwórz plik `.env.local` w głównym katalogu projektu i uzupełnij go własnymi kluczami (szczegóły w sekcji [Zmienne środowiskowe](#zmienne-środowiskowe)):
 
-   ```bash
-   cd with-supabase-app
-   ```
+```bash
+cp .env.example .env.local
+# następnie otwórz .env.local i uzupełnij wartości
+```
 
-4. Rename `.env.example` to `.env.local` and update the following:
+### 4. Przygotowanie bazy danych
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+Uruchom migracje, aby utworzyć wszystkie tabele:
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+```bash
+npm run db:migrate
+```
 
-5. You can now run the Next.js local development server:
+Załaduj dane początkowe:
 
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run db:seed
+```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+### 5. Uruchomienie serwera deweloperskiego
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+```bash
+npm run dev
+```
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+Aplikacja będzie dostępna pod adresem [http://localhost:3000](http://localhost:3000).
 
-## Feedback and issues
+### 6. Budowanie wersji produkcyjnej
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+```bash
+npm run build
+npm run start
+```
 
-## More Supabase examples
+---
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## Zmienne środowiskowe
+
+Utwórz plik `.env.local` w głównym katalogu projektu. Wszystkie wymagane wartości znajdziesz w panelu projektu na [neon.tech](https://neon.tech) po założeniu konta i projektu.
+
+```env
+# Połączenie z bazą danych PostgreSQL (Neon)
+DATABASE_URL=...
+
+# Integracja Neon Auth
+VITE_NEON_AUTH_URL=...
+
+# Klucz do szyfrowania ciasteczek sesji (dowolny losowy ciąg, minimum 32 znaki)
+NEON_AUTH_COOKIE_SECRET=...
+```
+
+> **Uwaga:** Plik `.env.local` jest automatycznie wykluczony przez `.gitignore` i nie powinien być commitowany do repozytorium.
+
+---
+
+## Architektura i struktura katalogów
+
+Aplikacja jest monolitem opartym na Next.js z podejściem **full-stack w jednym repozytorium**. Logika serwera (pobieranie danych, mutacje) realizowana jest przez React Server Components oraz Next.js Server Actions — bez osobnego backendu REST. Baza danych jest dostępna bezpośrednio z warstwy serwerowej za pomocą Drizzle ORM.
+
+### Struktura katalogów
+
+```
+tren-ui/
+├── app/                        # Trasy Next.js (App Router)
+│   ├── auth/                   # Strony logowania i rejestracji
+│   ├── dashboard/              # Chronione strony aplikacji
+│   │   ├── exercises/          # Biblioteka ćwiczeń + szczegóły
+│   │   ├── plans/              # Plany treningowe
+│   │   └── workouts/           # Lista i kreator treningów
+│   ├── workout-session/        # Aktywna sesja + podsumowanie
+│   └── api/auth/               # Endpointy Neon Auth (GET, POST)
+│
+├── components/                 # Komponenty React
+│   ├── ui/                     # Prymitywy shadcn/ui (button, input, card…)
+│   ├── workouts/builder/       # Kreator nowego treningu
+│   ├── exercises/              # Przeglądanie i wyszukiwanie ćwiczeń
+│   ├── plans/                  # Plany tygodniowe
+│   ├── workout-session/        # Śledzenie sesji na żywo
+│   ├── dashboard/              # Widżety pulpitu (statystyki)
+│   └── layout/                 # Nawigacja boczna, nagłówek, motyw
+│
+├── data/                       # Warstwa danych (Server Actions + fetchery)
+│   ├── workouts.actions.ts     # Tworzenie, edycja, usuwanie treningów
+│   ├── session.actions.ts      # Zapis ukończonej sesji
+│   ├── plans.actions.ts        # Zarządzanie planami
+│   ├── exercises.server.ts     # Pobieranie ćwiczeń po stronie serwera
+│   ├── workouts.server.ts      # Pobieranie treningów po stronie serwera
+│   └── dashboard.server.ts     # Obliczanie statystyk pulpitu
+│
+├── db/                         # Konfiguracja bazy danych
+│   ├── schema.ts               # Definicja tabel (Drizzle ORM)
+│   ├── index.ts                # Instancja połączenia z bazą
+│   └── seed.ts                 # Skrypt seedujący ćwiczenia
+│
+├── drizzle/                    # Migracje SQL (generowane automatycznie)
+├── stores/                     # Zustand — stan po stronie klienta
+│   ├── create-workout.store.ts # Stan formularza tworzenia treningu
+│   └── workout-session.store.ts# Stan aktywnej sesji (+ localStorage)
+│
+├── hooks/                      # Własne hooki React
+├── lib/auth/                   # Konfiguracja Neon Auth (serwer + klient)
+├── types/                      # Definicje TypeScript
+└── tests/                      # Testy jednostkowe (Jest)
+```
+
+### Przepływ danych
+
+```
+Przeglądarka
+    │
+    ▼
+Next.js App Router
+    ├── Server Component ──────► Drizzle ORM ──► Neon PostgreSQL
+    │   (render SSR, pobieranie danych)
+    │
+    └── Client Component
+            │
+            ├── Server Action ──► Drizzle ORM ──► Neon PostgreSQL
+            │   (mutacje: zapis, usunięcie)
+            │
+            └── Zustand Store
+                (stan lokalny, persistowany w localStorage)
+```
+
+### Ochrona tras
+
+Middleware w pliku `middleware.ts` weryfikuje sesję przy każdym żądaniu. Nieuwierzytelnieni użytkownicy próbujący wejść na ścieżki `/dashboard/*` lub `/workout-session/*` są automatycznie przekierowywani na `/auth/sign-in`.
+
+---
+
+## Funkcjonalności
+
+### Uwierzytelnianie
+- Rejestracja i logowanie przy użyciu adresu e-mail i hasła
+- Sesja przechowywana w ciasteczku HTTP-only zarządzanym przez Neon Auth
+- Automatyczne odświeżanie sesji przy każdym żądaniu (middleware)
+
+### Biblioteka ćwiczeń
+- Ponad 1000 predefiniowanych ćwiczeń z kategoryzacją
+- Wyszukiwanie po nazwie ćwiczenia
+- Filtrowanie według grupy mięśniowej (klatka, plecy, nogi itd.)
+- Filtrowanie według typu ćwiczenia (siłowe, kardio, core, plyometryczne, elastyczność)
+- Widok szczegółów z opisem, typem śledzenia i grupami mięśniowymi
+- Statystyki postępów dla każdego ćwiczenia (wykresy historii sesji, wskaźnik intensywności RPE)
+
+### Zarządzanie treningami
+- Tworzenie własnych treningów z dowolnego zestawu ćwiczeń z biblioteki
+- Edycja nazwy treningu i kolejności ćwiczeń metodą przeciągnij-i-upuść
+- Usuwanie treningu (kaskadowe usunięcie powiązanych sesji)
+- Lista treningów z nieskończonym przewijaniem
+
+### Plany treningowe
+- Tworzenie tygodniowych harmonogramów (7 dni, od poniedziałku do niedzieli)
+- Przypisywanie konkretnego treningu do każdego dnia tygodnia
+- Ustawianie jednego planu jako aktywnego
+- Aktywacja i dezaktywacja planów
+
+### Aktywna sesja treningowa
+- Rozpoczęcie sesji z poziomu zapisanego treningu jednym kliknięciem
+- Rejestrowanie serii dla każdego ćwiczenia:
+  - liczba powtórzeń
+  - ciężar (kg)
+  - czas trwania w sekundach — dla ćwiczeń kardio
+  - intensywność RPE (skala 1–10)
+- Dodawanie notatek do ćwiczenia
+- Zapis stanu sesji w `localStorage` — możliwy powrót po zamknięciu karty
+- Alert informujący o niedokończonej sesji przy wejściu na inną stronę
+
+### Pulpit i statystyki
+- Całkowita liczba ukończonych sesji treningowych
+- Liczba sesji w bieżącym tygodniu i miesiącu
+- Wyświetlanie dzisiejszego treningu z aktywnego planu
+- Szybkie przejście do sesji jednym kliknięciem
+
+---
+
+## Baza danych
+
+Schemat bazy danych zarządzany jest przez Drizzle ORM. Migracje SQL przechowywane są w katalogu `drizzle/` i generowane automatycznie na podstawie zmian w pliku `db/schema.ts`.
+
+### Schemat tabel
+
+| Tabela | Opis |
+|--------|------|
+| `exercises` | Biblioteka ćwiczeń (nazwa, typ, grupy mięśniowe, sposób śledzenia) |
+| `muscle_groups` | Słownik grup mięśniowych |
+| `workouts` | Treningi tworzone przez użytkownika |
+| `workout_exercises` | Powiązanie trening ↔ ćwiczenie (z kolejnością) |
+| `workout_session` | Zapis ukończonej sesji treningowej |
+| `exercise_session` | Ćwiczenia wykonane w ramach sesji |
+| `exercise_set` | Pojedyncze serie (powtórzenia, ciężar, czas, intensywność) |
+| `workout_plans` | Tygodniowe plany treningowe |
+| `workout_plan_days` | Przypisanie treningu do dnia tygodnia (0 = pon., 6 = ndz.) |
+
+### Typy wyliczeniowe (enums)
+
+- `exercise_tracking_type`: `reps` | `duration`
+- `exercise_weight_type`: `weighted` | `bodyweight`
+- `exercise_type`: `strength` | `cardio` | `flexibility` | `core` | `plyometric`
+
+### Polecenia zarządzania bazą
+
+```bash
+npm run db:generate   # Generowanie nowej migracji po zmianie schema.ts
+npm run db:migrate    # Aplikowanie migracji do bazy danych
+npm run db:push       # Szybkie naniesienie zmian (bez migracji, tylko dev)
+npm run db:studio     # Graficzny interfejs Drizzle Studio w przeglądarce
+npm run db:seed       # Załadowanie danych początkowych (ćwiczenia, grupy mięśniowe)
+```
+
+---
+
+## Testy
+
+Projekt zawiera testy jednostkowe komponentów React oparte na **Jest 30** i **React Testing Library 16**.
+
+### Uruchamianie testów
+
+```bash
+# Wszystkie testy
+npm run test
+
+# Pojedynczy plik testowy
+npx jest tests/workout-card.test.tsx
+
+# Tryb watch (automatyczne uruchamianie po zmianach)
+npx jest --watch
+```
+
+### Pokrycie testami
+
+| Plik testowy | Testowany komponent | Zakres |
+|---|---|---|
+| `add-workout-name-input.test.tsx` | `AddWorkoutNameInput` | Synchronizacja ze Zustand, walidacja |
+| `add-workout-save-button.test.tsx` | `AddWorkoutSaveButton` | Stany disabled, zapis, obsługa błędów |
+| `add-workout-selected-exercises.test.tsx` | `AddWorkoutSelectedExercises` | Lista ćwiczeń, drag-and-drop |
+| `workout-card.test.tsx` | `WorkoutCard` | Renderowanie danych treningu |
+| `workout-card-actions.test.tsx` | `WorkoutCardActions` | Usuwanie z potwierdzeniem, obsługa błędów |
+| `exercise-card.test.tsx` | `ExerciseCard` | Wyświetlanie danych ćwiczenia |
+| `exercise-search.test.tsx` | `ExerciseSearch` | Wyszukiwanie, filtrowanie |
+| `exercise-stats.test.tsx` | `ExerciseStats` | Wykresy, wskaźniki intensywności RPE |
+| `start-workout-button.test.tsx` | `StartWorkoutButton` | Nawigacja do sesji |
+| `finish-workout-button.test.tsx` | `FinishWorkoutButton` | Zapis sesji, czyszczenie store |
+| `plan-card-actions.test.tsx` | `PlanCardActions` | Usuwanie planu, powiadomienia toast |
+| `set-active-plan-button.test.tsx` | `SetActivePlanButton` | Aktywacja i dezaktywacja planu |
+
+Środowisko testowe to **jsdom**. Konfiguracja znajduje się w `jest.config.ts` i `jest.setup.ts`. Moduły zewnętrzne (`next/navigation`, `sonner`, `next-themes`) są mockowane per plik testowy.
+
+---
+
+## Autor
+
+| | |
+|---|---|
+| **Imię i nazwisko** | Mikołaj Rudkowski |
+| **Uczelnia** | Warszawska Wyższa Szkoła Informatyki |
+| **Kierunek** | Informatyka |
+
+---
+
+*Projekt zrealizowany jako praca inżynierska.*
