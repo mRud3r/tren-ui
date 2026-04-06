@@ -1,6 +1,7 @@
 'use server'
 
 import { eq, inArray } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
 import { db } from '@/db'
 import { workouts, workoutExercises, workoutPlanDays, workoutSession, exerciseSession, exerciseSet } from '@/db/schema'
 import { getCurrentUserId } from '@/lib/auth'
@@ -67,6 +68,7 @@ export async function createWorkout({
 			)
 		}
 	})
+	revalidatePath('/dashboard/workouts')
 }
 
 export async function updateWorkout({
@@ -101,4 +103,5 @@ export async function updateWorkout({
 			)
 		}
 	})
+	revalidatePath('/dashboard/workouts')
 }

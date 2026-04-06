@@ -43,7 +43,6 @@ export function EditWorkoutSaveButton({ workoutId }: { workoutId: number }) {
 			clear()
 			toast.success('Changes saved!')
 			router.push('/dashboard/workouts')
-			router.refresh()
 		} catch (error) {
 			console.error('Failed to update workout:', error)
 			const message = error instanceof Error ? error.message : 'Failed to update workout.'

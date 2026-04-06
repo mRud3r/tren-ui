@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { EllipsisVertical, Trash } from 'lucide-react'
+import { EllipsisVertical, SquarePen, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -38,6 +39,12 @@ export function PlanCardActions({ planId }: { planId: number }) {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align='end' className='w-36'>
+					<DropdownMenuItem asChild disabled={deleting}>
+						<Link href={`/dashboard/plans/edit/${planId}`} className='flex items-center gap-2'>
+							<SquarePen className='h-4 w-4' />
+							<span>Edit</span>
+						</Link>
+					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={deleting}
 						onSelect={e => {

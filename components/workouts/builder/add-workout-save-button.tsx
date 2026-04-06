@@ -43,7 +43,6 @@ export function AddWorkoutSaveButton() {
 			clear()
 			toast.success('Workout saved!')
 			router.push('/dashboard/workouts')
-			router.refresh()
 		} catch (error) {
 			console.error('Failed to save workout:', error)
 			const message = error instanceof Error ? error.message : 'Failed to save workout.'
