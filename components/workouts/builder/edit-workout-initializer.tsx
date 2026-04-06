@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useCreateWorkoutStore } from '@/stores/create-workout.store'
 import type { ExerciseCardData } from '@/types/exercise.types'
 
@@ -14,12 +14,14 @@ export function EditWorkoutInitializer({ name, exercises }: Props) {
 	const setName = useCreateWorkoutStore(state => state.setName)
 	const addExercise = useCreateWorkoutStore(state => state.addExercise)
 
+	const initialName = useRef(name)
+	const initialExercises = useRef(exercises)
+
 	useEffect(() => {
 		clear()
-		setName(name)
-		exercises.forEach(ex => addExercise(ex))
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+		setName(initialName.current)
+		initialExercises.current.forEach(ex => addExercise(ex))
+	}, [clear, setName, addExercise])
 
 	return null
 }

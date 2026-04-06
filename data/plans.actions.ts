@@ -69,9 +69,8 @@ export async function createPlan({
 
 export async function deletePlan(planId: number): Promise<void> {
 	const userId = await getCurrentUserId()
-	await db.delete(workoutPlans).where(eq(workoutPlans.id, planId)).returning()
-	// Note: user check will be added when auth is implemented
-	void userId
+	await db.delete(workoutPlans).where(eq(workoutPlans.id, planId) && eq(workoutPlans.userId, userId))
+	revalidatePath('/dashboard/plans')
 }
 
 export async function deactivatePlan(planId: number): Promise<void> {
